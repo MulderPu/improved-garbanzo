@@ -8,7 +8,6 @@
 *.war
 *.ear
 .idea/workspace.xml
-.idea/encodings.xml
 .idea/misc.xml
 .idea/copyright
 *.iml
