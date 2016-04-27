@@ -8,6 +8,8 @@
 *.war
 *.ear
 .idea/workspace.xml
+.idea/misc.xml
+.idea/copyright
 *.iml
 /out/
 
