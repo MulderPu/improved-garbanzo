@@ -17,10 +17,10 @@ public class Gui extends JFrame implements ActionListener{
     JTextArea textArea1;
 
     public Gui(){
-        displayFrame1();
+        displayFrameHome();
     }
 
-    public void displayFrame1(){
+    public void displayFrameHome(){
         frame1 = new JFrame("Student Assessment Recording Application");
         frame1.setSize(1000,700);
         frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -88,10 +88,14 @@ public class Gui extends JFrame implements ActionListener{
             gbc.gridy = 0;
 
             //create random label just for show
-            JLabel label1 = new JLabel("Welcome to the system!");
+            JLabel label1 = new JLabel("Welcome to the system! \n");
             Font myFont = new Font("Serif", Font.BOLD, 20);
             label1.setFont(myFont);
             this.add(label1, gbc);
+            gbc.gridy++;
+            JLabel label2 = new JLabel("Home Menu \n");
+            label2.setFont(myFont);
+            this.add(label2, gbc);
             gbc.gridy++;
 
             //create a button
@@ -157,6 +161,7 @@ public class Gui extends JFrame implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnManageStudent){
+                System.out.println("Manage student clicked");
                 frame1.setVisible(false);
                 frame2 = new JFrame("Student Assessment Recording Application");
                 frame2.setSize(1000,700);
@@ -171,13 +176,13 @@ public class Gui extends JFrame implements ActionListener{
                 frame2.setVisible(true);
             }
             else if(e.getSource() == btnManageUnit){
-
+                System.out.println("Manage unit clicked");
             }
             else if(e.getSource() == btnManageClass){
-
+                System.out.println("Manage class clicked");
             }
             else if(e.getSource() == btnManageAssessment){
-
+                System.out.println("Manage assessment clicked");
             }
             else if(e.getSource() == btnManageExit){
                 int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?", "Confirm",
@@ -190,6 +195,24 @@ public class Gui extends JFrame implements ActionListener{
                 } else if (response == JOptionPane.CLOSED_OPTION) {
                     System.out.println("JOptionPane closed");
                 }
+            }
+            else if(e.getSource() == btnCreateStd){
+                System.out.println("Create student clicked");
+
+            }
+            else if(e.getSource() == btnViewStd){
+                System.out.println("View student clicked");
+            }
+            else if(e.getSource() == btnEditStd){
+                System.out.println("Edit student clicked");
+            }
+            else if(e.getSource() == btnDeleteStd){
+                System.out.println("Delete student clicked");
+            }
+            else if(e.getSource() == btnBack){
+                System.out.println("Back button clicked");
+                frame2.setVisible(false);
+                displayFrameHome();
             }
         }
     }
