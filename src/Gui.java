@@ -10,7 +10,8 @@ import java.awt.event.KeyEvent;
  * Created by Mulder on 5/1/2016.
  */
 public class Gui extends JFrame implements ActionListener{
-    JButton btnManageStudent;
+    JButton btnManageStudent, btnManageUnit ,btnManageClass, btnManageAssessment, btnManageExit;
+    JTextArea textArea1;
 
     public Gui(){
         //Create menu bar
@@ -18,21 +19,79 @@ public class Gui extends JFrame implements ActionListener{
         this.setTitle("Student Assessment Recording Application");
         this.setSize(1000,700);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        setLayout(new GridLayout(1,2,10,0));
-        JPanel thePanel = new JPanel();
-
-        //create a button
-        btnManageStudent = new JButton("Get Answer");
-        ListenForButton lForButton = new ListenForButton();
-        btnManageStudent.addActionListener(lForButton);
-        thePanel.add(btnManageStudent);
-
-        this.add(thePanel);
-
-        JLabel label2 = new JLabel("Area Text show here.");
-        add(label2);
+        this.setLayout(new GridLayout(1,2,0,0));
+        this.add(new leftPanel());
+        this.add(new rightPanel());
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
+    }
+
+    protected class leftPanel extends JPanel{
+
+        public leftPanel() {
+            this.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+
+            //create random label just for show
+            JLabel label1 = new JLabel("Welcome to the system!");
+            Font myFont = new Font("Serif", Font.BOLD, 20);
+            label1.setFont(myFont);
+            this.add(label1, gbc);
+            gbc.gridy++;
+
+            //create a button
+            btnManageStudent    = new JButton("Manage Student");
+            btnManageUnit       = new JButton("Manage Unit");
+            btnManageClass      = new JButton("Manage Class");
+            btnManageAssessment = new JButton("Manage Assessment");
+            btnManageExit       = new JButton("Exit Application");
+            btnManageExit.setToolTipText("Exit");
+
+            //Create a listener for button and add button to it
+            ListenForButton lForButton = new ListenForButton();
+            btnManageStudent.addActionListener(lForButton);
+            btnManageUnit.addActionListener(lForButton);
+            btnManageClass.addActionListener(lForButton);
+            btnManageAssessment.addActionListener(lForButton);
+            btnManageExit.addActionListener(lForButton);
+
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(30,10,0,0);
+            gbc.ipady = 40;
+            gbc.ipadx = 100;
+            this.add(btnManageStudent,gbc);
+            gbc.gridy++;
+            this.add(btnManageUnit,gbc);
+            gbc.gridy++;
+            this.add(btnManageClass,gbc);
+            gbc.gridy++;
+            this.add(btnManageAssessment,gbc);
+            gbc.gridy++;
+            this.add(btnManageExit,gbc);
+        }
+    }
+
+    protected class rightPanel extends JPanel{
+
+        public rightPanel() {
+            JLabel label1 = new JLabel("Information: ");
+            this.add(label1);
+
+            //create a textArea
+            textArea1 = new JTextArea(35,40);
+            textArea1.setText("Welcome to the Student Assessment Recording Application\n");
+            textArea1.setLineWrap(true); //end then wrap to next line
+            textArea1.setWrapStyleWord(true); //not split words
+
+            int numOfLines = textArea1.getLineCount();
+            textArea1.append("Number of lines: " + numOfLines);
+            this.add(textArea1);
+
+            JScrollPane scrollbar1 = new JScrollPane(textArea1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            this.add(scrollbar1);
+        }
     }
 
     @Override
@@ -46,6 +105,27 @@ public class Gui extends JFrame implements ActionListener{
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnManageStudent){
 
+            }
+            else if(e.getSource() == btnManageUnit){
+
+            }
+            else if(e.getSource() == btnManageClass){
+
+            }
+            else if(e.getSource() == btnManageAssessment){
+
+            }
+            else if(e.getSource() == btnManageExit){
+                int response = JOptionPane.showConfirmDialog(null, "Do you want to exit?", "Confirm",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (response == JOptionPane.NO_OPTION) {
+                    System.out.println("No button clicked");
+                } else if (response == JOptionPane.YES_OPTION) {
+                    System.out.println("Yes button clicked");
+                    System.exit(0);
+                } else if (response == JOptionPane.CLOSED_OPTION) {
+                    System.out.println("JOptionPane closed");
+                }
             }
         }
     }
@@ -112,4 +192,5 @@ public class Gui extends JFrame implements ActionListener{
         //add menu bar to frame
         this.setJMenuBar(menuBar);
     }
+
 }
