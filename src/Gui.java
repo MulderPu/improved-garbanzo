@@ -10,20 +10,73 @@ import java.awt.event.KeyEvent;
  * Created by Mulder on 5/1/2016.
  */
 public class Gui extends JFrame implements ActionListener{
+    JFrame frame1, frame2;
     JButton btnManageStudent, btnManageUnit ,btnManageClass, btnManageAssessment, btnManageExit;
+    JButton btnCreateStd, btnViewStd, btnEditStd, btnDeleteStd;
+    JButton btnBack;
     JTextArea textArea1;
 
     public Gui(){
+        displayFrame1();
+    }
+
+    public void displayFrame1(){
+        frame1 = new JFrame("Student Assessment Recording Application");
+        frame1.setSize(1000,700);
+        frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //Create menu bar
-        createMenuBar();
-        this.setTitle("Student Assessment Recording Application");
-        this.setSize(1000,700);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(new GridLayout(1,2,0,0));
-        this.add(new leftPanel());
-        this.add(new rightPanel());
-        this.setLocationRelativeTo(null);
-        this.setVisible(true);
+        createMenuBar(frame1);
+        frame1.setLayout(new GridLayout(1,2,0,0));
+        frame1.add(new leftPanel());
+        frame1.add(new rightPanel());
+        frame1.setLocationRelativeTo(null);
+        frame1.setVisible(true);
+    }
+
+    protected  class studentPanel extends JPanel{
+        public studentPanel() {
+            this.setLayout(new GridBagLayout());
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 0;
+
+            //create random label just for show
+            JLabel label1 = new JLabel("Student Menu");
+            Font myFont = new Font("Serif", Font.BOLD, 20);
+            label1.setFont(myFont);
+            this.add(label1, gbc);
+            gbc.gridy++;
+
+            //create a button
+            btnCreateStd = new JButton("Create Student");
+            btnViewStd   = new JButton("View Unit");
+            btnEditStd   = new JButton("Edit Class");
+            btnDeleteStd = new JButton("Delete Assessment");
+            btnBack      = new JButton("Back to Home");
+            btnBack.setToolTipText("return to home");
+
+            //Create a listener for button and add button to it
+            ListenForButton lForButton = new ListenForButton();
+            btnCreateStd.addActionListener(lForButton);
+            btnViewStd.addActionListener(lForButton);
+            btnEditStd.addActionListener(lForButton);
+            btnDeleteStd.addActionListener(lForButton);
+            btnBack.addActionListener(lForButton);
+
+            gbc.fill = GridBagConstraints.HORIZONTAL;
+            gbc.insets = new Insets(30,10,0,0);
+            gbc.ipady = 40;
+            gbc.ipadx = 100;
+            this.add(btnCreateStd,gbc);
+            gbc.gridy++;
+            this.add(btnViewStd,gbc);
+            gbc.gridy++;
+            this.add(btnEditStd,gbc);
+            gbc.gridy++;
+            this.add(btnDeleteStd,gbc);
+            gbc.gridy++;
+            this.add(btnBack,gbc);
+        }
     }
 
     protected class leftPanel extends JPanel{
@@ -99,12 +152,23 @@ public class Gui extends JFrame implements ActionListener{
         System.out.println(e.getActionCommand());
     }
 
-    public class ListenForButton implements ActionListener {
+    public class ListenForButton extends JFrame implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnManageStudent){
-
+                frame1.setVisible(false);
+                frame2 = new JFrame("Student Assessment Recording Application");
+                frame2.setSize(1000,700);
+                //Create menu bar
+                createMenuBar(frame2);
+                frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame2.setLayout(new GridLayout(1,2,0,0));
+                frame2.setLocationRelativeTo(null);
+                System.out.println("Manage student clicked");
+                frame2.add(new studentPanel());
+                frame2.add(new rightPanel());
+                frame2.setVisible(true);
             }
             else if(e.getSource() == btnManageUnit){
 
@@ -130,7 +194,7 @@ public class Gui extends JFrame implements ActionListener{
         }
     }
 
-    public void createMenuBar(){
+    public void createMenuBar(JFrame frame){
         //Create menu bar to hold list of menu
         JMenuBar menuBar = new JMenuBar();
         ImageIcon iconExit = new ImageIcon("images/exit.png");
@@ -190,7 +254,7 @@ public class Gui extends JFrame implements ActionListener{
         menuBar.add(menu3);
 
         //add menu bar to frame
-        this.setJMenuBar(menuBar);
+        frame.setJMenuBar(menuBar);
     }
 
 }
