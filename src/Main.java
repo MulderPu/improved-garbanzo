@@ -1758,9 +1758,11 @@ public class Main implements Serializable {
     private static void readStudentFile(){
         try {
             FileInputStream fis = new FileInputStream("student.txt");
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            studentList = (ArrayList) ois.readObject();
-            ois.close();
+            if(fis.read()!= -1) {
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                studentList = (ArrayList) ois.readObject();
+                ois.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

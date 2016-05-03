@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Project Name : improved-garbanzo
@@ -11,10 +13,21 @@ import java.awt.event.KeyEvent;
  */
 public class Gui extends JFrame implements ActionListener{
     JFrame frame1, frame2;
+    JFrame frameCreateStd, frameEditStd, frameDeleteStd;
     JButton btnManageStudent, btnManageUnit ,btnManageClass, btnManageAssessment, btnManageExit;
-    JButton btnCreateStd, btnViewStd, btnEditStd, btnDeleteStd;
-    JButton btnBack;
+    //Student Panel
+    JButton btnStdCreate, btnStdView, btnStdEdit, btnStdDelete;
+    JButton btnBackHome;
     JTextArea textArea1;
+    String infoOnComponent = "";
+
+    static  ArrayList<Student> studentList = new ArrayList<>();
+    static  ArrayList<Unit> unitList = new ArrayList<>();
+    static  ArrayList<Class> classList = new ArrayList<>();
+    static  ArrayList<Assessment> assessmentList = new ArrayList<>();
+    static  ArrayList<Assessment> assessmentList2 = new ArrayList<>();
+    static ArrayList<Submission> submissionsList = new ArrayList<>();
+    static boolean loop = true;
 
     public Gui(){
         displayFrameHome();
@@ -33,7 +46,7 @@ public class Gui extends JFrame implements ActionListener{
         frame1.setVisible(true);
     }
 
-    protected  class studentPanel extends JPanel{
+    private class studentPanel extends JPanel{
         public studentPanel() {
             this.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
@@ -48,38 +61,38 @@ public class Gui extends JFrame implements ActionListener{
             gbc.gridy++;
 
             //create a button
-            btnCreateStd = new JButton("Create Student");
-            btnViewStd   = new JButton("View Unit");
-            btnEditStd   = new JButton("Edit Class");
-            btnDeleteStd = new JButton("Delete Assessment");
-            btnBack      = new JButton("Back to Home");
-            btnBack.setToolTipText("return to home");
+            btnStdCreate = new JButton("Create Student");
+            btnStdView   = new JButton("View Unit");
+            btnStdEdit   = new JButton("Edit Class");
+            btnStdDelete = new JButton("Delete Assessment");
+            btnBackHome      = new JButton("Back to Home");
+            btnBackHome.setToolTipText("return to home");
 
             //Create a listener for button and add button to it
             ListenForButton lForButton = new ListenForButton();
-            btnCreateStd.addActionListener(lForButton);
-            btnViewStd.addActionListener(lForButton);
-            btnEditStd.addActionListener(lForButton);
-            btnDeleteStd.addActionListener(lForButton);
-            btnBack.addActionListener(lForButton);
+            btnStdCreate.addActionListener(lForButton);
+            btnStdView.addActionListener(lForButton);
+            btnStdEdit.addActionListener(lForButton);
+            btnStdDelete.addActionListener(lForButton);
+            btnBackHome.addActionListener(lForButton);
 
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.insets = new Insets(30,10,0,0);
             gbc.ipady = 40;
             gbc.ipadx = 100;
-            this.add(btnCreateStd,gbc);
+            this.add(btnStdCreate,gbc);
             gbc.gridy++;
-            this.add(btnViewStd,gbc);
+            this.add(btnStdView,gbc);
             gbc.gridy++;
-            this.add(btnEditStd,gbc);
+            this.add(btnStdEdit,gbc);
             gbc.gridy++;
-            this.add(btnDeleteStd,gbc);
+            this.add(btnStdDelete,gbc);
             gbc.gridy++;
-            this.add(btnBack,gbc);
+            this.add(btnBackHome,gbc);
         }
     }
 
-    protected class leftPanel extends JPanel{
+    private class leftPanel extends JPanel{
 
         public leftPanel() {
             this.setLayout(new GridBagLayout());
@@ -130,7 +143,7 @@ public class Gui extends JFrame implements ActionListener{
         }
     }
 
-    protected class rightPanel extends JPanel{
+    private class rightPanel extends JPanel{
 
         public rightPanel() {
             JLabel label1 = new JLabel("Information: ");
@@ -138,14 +151,8 @@ public class Gui extends JFrame implements ActionListener{
 
             //create a textArea
             textArea1 = new JTextArea(35,40);
-            textArea1.setText("Welcome to the Student Assessment Recording Application\n");
             textArea1.setLineWrap(true); //end then wrap to next line
             textArea1.setWrapStyleWord(true); //not split words
-
-            int numOfLines = textArea1.getLineCount();
-            textArea1.append("Number of lines: " + numOfLines);
-            this.add(textArea1);
-
             JScrollPane scrollbar1 = new JScrollPane(textArea1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
             this.add(scrollbar1);
         }
@@ -173,6 +180,7 @@ public class Gui extends JFrame implements ActionListener{
                 System.out.println("Manage student clicked");
                 frame2.add(new studentPanel());
                 frame2.add(new rightPanel());
+                displayStudentList(); //display student list in text area
                 frame2.setVisible(true);
             }
             else if(e.getSource() == btnManageUnit){
@@ -196,23 +204,167 @@ public class Gui extends JFrame implements ActionListener{
                     System.out.println("JOptionPane closed");
                 }
             }
-            else if(e.getSource() == btnCreateStd){
-                System.out.println("Create student clicked");
-
+            else if(e.getSource() == btnStdCreate){
+                System.out.println("Student Create clicked");
+                createStdDialogBox();
             }
-            else if(e.getSource() == btnViewStd){
+            else if(e.getSource() == btnStdView){
                 System.out.println("View student clicked");
+                viewStdDialogBox();
             }
-            else if(e.getSource() == btnEditStd){
+            else if(e.getSource() == btnStdEdit){
                 System.out.println("Edit student clicked");
+                
             }
-            else if(e.getSource() == btnDeleteStd){
+            else if(e.getSource() == btnStdDelete){
                 System.out.println("Delete student clicked");
             }
-            else if(e.getSource() == btnBack){
+            else if(e.getSource() == btnBackHome){
                 System.out.println("Back button clicked");
                 frame2.setVisible(false);
                 displayFrameHome();
+            }
+        }
+
+        private void viewStdDialogBox() {
+            JTextField stdIndex = new JTextField();
+
+            final JComponent[] inputs = new JComponent[] {
+                    new JLabel("Enter Student Name: "),
+                    stdIndex
+            };
+
+            int response = JOptionPane.showConfirmDialog(null, inputs , "View Student",
+                    JOptionPane.OK_CANCEL_OPTION);
+            if (response == JOptionPane.CANCEL_OPTION) {
+                System.out.println("Cancel button clicked");
+            } else if (response == JOptionPane.OK_OPTION) {
+                System.out.println("Ok button clicked");
+
+                if(stdIndex.getText().equals("") ){
+                    infoOnComponent = "Empty is not accepted.\n";
+                    infoOnComponent += "Please re-enter info.";
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.WARNING_MESSAGE);
+                    infoOnComponent = "";
+                }
+                else{
+                    try{
+                        String userInput = stdIndex.getText();
+                        int index = Integer.parseInt(userInput);
+                        //read student file
+                        readStudentFile();
+
+                        for (int i = 0; i < studentList.size(); i++) {
+                            if (i == index){
+                                String stdName = studentList.get(i).getName();
+                                String stdId = studentList.get(i).getId();
+                                String stdProgram = studentList.get(i).getProgram();
+
+                                infoOnComponent = "Student Name: " + stdName + "\n"
+                                                + "Student ID: " + stdId + "\n"
+                                                + "Student Program: " + stdProgram;
+                                JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                                infoOnComponent = "";
+                            }
+                        }
+                    }catch (NumberFormatException e){
+                        infoOnComponent = "Enter number only.";
+                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.WARNING_MESSAGE);
+                        infoOnComponent = "";
+                    }
+                }
+            } else if (response == JOptionPane.CLOSED_OPTION) {
+                System.out.println("JOptionPane closed");
+            }
+        }
+
+        private void displayStudentList() {
+            textArea1.setText("Student Lists: \n" );
+            File studentFile = new File("student.txt");
+            if (studentFile.length() == 0) {
+                System.out.println("Empty File");
+            } else {
+                readStudentFile();
+            }
+
+            //loop for student list
+            for (int i = 0; i < studentList.size(); i++) {
+                textArea1.append(i + "." + studentList.get(i).getName() + "\n");
+            }
+        }
+
+        private void createStdDialogBox() {
+            JTextField stdName = new JTextField();
+            JTextField stdId = new JTextField();
+            JTextField stdProgram = new JTextField();
+            final JComponent[] inputs = new JComponent[] {
+                    new JLabel("Enter Student Name: "),
+                    stdName,
+                    new JLabel("Enter Student ID: "),
+                    stdId,
+                    new JLabel("Enter Student Program: "),
+                    stdProgram
+            };
+
+            int response = JOptionPane.showConfirmDialog(null, inputs , "Create Student",
+                    JOptionPane.OK_CANCEL_OPTION);
+            if (response == JOptionPane.CANCEL_OPTION) {
+                System.out.println("Cancel button clicked");
+            } else if (response == JOptionPane.OK_OPTION) {
+                System.out.println("Ok button clicked");
+
+                if(stdName.getText().equals("") && stdId.getText().equals("") && stdProgram.getText().equals("")){
+                    infoOnComponent = "Incomplete student info.\n";
+                    infoOnComponent += "Please re-enter student info.";
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.WARNING_MESSAGE);
+                    infoOnComponent = "";
+                }
+                else{
+                    String inputName = stdName.getText();
+                    String inputId = stdId.getText();
+                    String inputProgram = stdProgram.getText();
+
+                    //create student, add to arraylist
+                    Student newStudent = new Student(inputName, inputId, inputProgram);
+                    studentList.add(newStudent);
+
+                    //store arraylist in txt file
+                    writeStudentFile();
+
+                    infoOnComponent = "You entered " +
+                            stdName.getText() + ", " +
+                            stdId.getText() + ", " +
+                            stdProgram.getText();
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                    infoOnComponent = "";
+                    displayStudentList();
+                }
+            } else if (response == JOptionPane.CLOSED_OPTION) {
+                System.out.println("JOptionPane closed");
+            }
+        }
+
+        //read student file
+        private void readStudentFile(){
+            try {
+                FileInputStream fis = new FileInputStream("student.txt");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                studentList = (ArrayList) ois.readObject();
+                ois.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        //write student file
+        private void writeStudentFile(){
+            try {
+                FileOutputStream fos = new FileOutputStream("student.txt");
+                ObjectOutputStream oos = new ObjectOutputStream(fos);
+                oos.writeObject(studentList);
+                oos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }
