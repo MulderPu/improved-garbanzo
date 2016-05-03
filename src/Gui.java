@@ -9,10 +9,10 @@ import java.util.ArrayList;
  * Created by Mulder on 5/1/2016.
  */
 public class Gui extends JFrame implements ActionListener{
-    JFrame frameHome, frameStd;
+    JFrame frameHome, frameStd, frameUnit, frameClass, frameAssessment;
     JButton btnManageStudent, btnManageUnit ,btnManageClass, btnManageAssessment, btnManageExit;
-    JButton btnStdCreate, btnStdView, btnStdEdit, btnStdDelete;
-    JButton btnBackHome;
+    JButton btnStdCreate, btnStdView, btnStdEdit, btnStdDelete, btnStdBack;
+    JButton btnUnitCreate, btnUnitView, btnUnitEdit, btnUnitDelete, btnUnitBack;
     JTextArea textArea1;
     String infoOnComponent = "";
     JMenuItem menu1_Item1;
@@ -44,55 +44,6 @@ public class Gui extends JFrame implements ActionListener{
         ListenForWindow lForWindow = new ListenForWindow();
         frameHome.addWindowListener(lForWindow);
         frameHome.setVisible(true);
-    }
-
-    /**
-     * Display student menu
-     */
-    private class studentPanel extends JPanel{
-        public studentPanel() {
-            this.setLayout(new GridBagLayout());
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 0;
-
-            //create random label just for show
-            JLabel label1 = new JLabel("Student Menu");
-            Font myFont = new Font("Serif", Font.BOLD, 20);
-            label1.setFont(myFont);
-            this.add(label1, gbc);
-            gbc.gridy++;
-
-            //create a button
-            btnStdCreate = new JButton("Create Student");
-            btnStdView   = new JButton("View Student");
-            btnStdEdit   = new JButton("Edit Student");
-            btnStdDelete = new JButton("Delete Student");
-            btnBackHome      = new JButton("Back to Home");
-            btnBackHome.setToolTipText("return to home");
-
-            //Create a listener for button and add button to it
-            ListenForButton lForButton = new ListenForButton();
-            btnStdCreate.addActionListener(lForButton);
-            btnStdView.addActionListener(lForButton);
-            btnStdEdit.addActionListener(lForButton);
-            btnStdDelete.addActionListener(lForButton);
-            btnBackHome.addActionListener(lForButton);
-
-            gbc.fill = GridBagConstraints.HORIZONTAL;
-            gbc.insets = new Insets(30,10,0,0);
-            gbc.ipady = 40;
-            gbc.ipadx = 100;
-            this.add(btnStdCreate,gbc);
-            gbc.gridy++;
-            this.add(btnStdView,gbc);
-            gbc.gridy++;
-            this.add(btnStdEdit,gbc);
-            gbc.gridy++;
-            this.add(btnStdDelete,gbc);
-            gbc.gridy++;
-            this.add(btnBackHome,gbc);
-        }
     }
 
     /**
@@ -187,17 +138,32 @@ public class Gui extends JFrame implements ActionListener{
                 frameStd.setSize(1000,700);
                 //Create menu bar
                 createMenuBar(frameStd);
-                frameStd.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frameStd.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
                 frameStd.setLayout(new GridLayout(1,2,0,0));
-                frameStd.setLocationRelativeTo(null);
-                System.out.println("Manage student clicked");
                 frameStd.add(new studentPanel());
                 frameStd.add(new rightPanel());
                 displayStudentList(); //display student list in text area
+                ListenForWindow lForWindow = new ListenForWindow();
+                frameStd.addWindowListener(lForWindow);
+                frameStd.setLocationRelativeTo(null);
                 frameStd.setVisible(true);
             }
             else if(e.getSource() == btnManageUnit){
                 System.out.println("Manage unit clicked");
+                frameHome.setVisible(false);
+                frameUnit = new JFrame("Student Assessment Recording Application");
+                frameUnit.setSize(1000,700);
+                //Create menu bar
+                createMenuBar(frameUnit);
+                frameUnit.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+                frameUnit.setLayout(new GridLayout(1,2,0,0));
+                frameUnit.add(new unitPanel());
+                frameUnit.add(new rightPanel());
+                displayUnitList(); //display unit list in text area
+                ListenForWindow lForWindow = new ListenForWindow();
+                frameUnit.addWindowListener(lForWindow);
+                frameUnit.setLocationRelativeTo(null);
+                frameUnit.setVisible(true);
             }
             else if(e.getSource() == btnManageClass){
                 System.out.println("Manage class clicked");
@@ -233,228 +199,243 @@ public class Gui extends JFrame implements ActionListener{
                 System.out.println("Delete student clicked");
                 deleteStdDialogBox();
             }
-            else if(e.getSource() == btnBackHome){
+            else if(e.getSource() == btnStdBack){
                 System.out.println("Back button clicked");
                 frameStd.setVisible(false);
                 displayFrameHome();
             }
+            else if(e.getSource() == btnUnitCreate){
+                System.out.println("Create unit clicked");
+                createUnitDialogBox();
+            }
+            else if(e.getSource() == btnUnitView){
+                System.out.println("View unit clicked");
+                viewUnitDialogBox();
+            }
+            else if(e.getSource() == btnUnitEdit){
+                System.out.println("Edit unit clicked");
+                editUnitDialogBox();
+            }
+            else if(e.getSource() == btnUnitDelete){
+                System.out.println("Delete unit clicked");
+                deleteUnitDialogBox();
+            }
+            else if(e.getSource() == btnUnitBack){
+                System.out.println("Back button clicked");
+                frameUnit.setVisible(false);
+                displayFrameHome();
+            }
         }
 
-        /**
-         * Display dialog that allow user to delete student
-         */
-        private void deleteStdDialogBox() {
-            JTextField stdIndex = new JTextField();
+        private void deleteUnitDialogBox() {
+            //read unit file
+            readUnitFile();
 
-            final JComponent[] inputs = new JComponent[] {
-                    new JLabel("Enter Student Number: "),
-                    stdIndex
-            };
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Unit anUnitList : unitList) {
+                String name = anUnitList.getName();
+                tempList.add(name);
+            }
 
-            int response = JOptionPane.showConfirmDialog(null, inputs , "View Student",
-                    JOptionPane.OK_CANCEL_OPTION);
-            if (response == JOptionPane.CANCEL_OPTION) {
-                System.out.println("Cancel button clicked");
-            } else if (response == JOptionPane.OK_OPTION) {
-                System.out.println("Ok button clicked");
+            Object[] options = tempList.toArray();
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which unit to delete?",
+                    "Delete Unit",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
 
-                if(stdIndex.getText().equals("") ){
-                    infoOnComponent = "Empty is not accepted.\n";
-                    infoOnComponent += "Please re-enter info.";
-                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
-                    infoOnComponent = "";
-                }
-                else{
-                    try{
-                        String userInput = stdIndex.getText();
-                        int index = Integer.parseInt(userInput);
-                        //read student file
-                        readStudentFile();
+            int index = tempList.indexOf(value);
+            System.out.println(index);
 
-                        for (int i = 0; i < studentList.size(); i++) {
-                            if (i == index){
+            for (int i = 0; i < unitList.size(); i++) {
+                if (i == index){
 
-                                JLabel labelStd = new JLabel(studentList.get(i).getName());
-                                final JComponent[] UserInput = new JComponent[] {
-                                        new JLabel("Do you want to delete this student?"),
-                                        labelStd
-                                };
+                    JLabel labelUnit = new JLabel(unitList.get(i).getName());
+                    final JComponent[] UserInput = new JComponent[] {
+                            new JLabel("Do you want to delete this unit?"),
+                            labelUnit
+                    };
 
-                                int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Delete",
-                                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                                if (responses == JOptionPane.NO_OPTION) {
-                                    System.out.println("No button clicked");
-                                } else if (responses == JOptionPane.YES_OPTION) {
-                                    System.out.println("Yes button clicked");
-                                    studentList.remove(i);
-                                    writeStudentFile();
-                                    infoOnComponent = "Student had been deleted. ";
-                                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
-                                    infoOnComponent = "";
-                                    displayStudentList();
-                                } else if (responses == JOptionPane.CLOSED_OPTION) {
-                                    System.out.println("JOptionPane closed");
-                                }
-                            }
-                        }
-                    }catch (NumberFormatException e){
-                        infoOnComponent = "Enter number only.";
-                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
+                    int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (responses == JOptionPane.NO_OPTION) {
+                        System.out.println("No button clicked");
+                    } else if (responses == JOptionPane.YES_OPTION) {
+                        System.out.println("Yes button clicked");
+                        unitList.remove(i);
+                        writeUnitFile();
+                        infoOnComponent = "Unit had been deleted. ";
+                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.INFORMATION_MESSAGE);
                         infoOnComponent = "";
+                        displayUnitList();
+                    } else if (responses == JOptionPane.CLOSED_OPTION) {
+                        System.out.println("JOptionPane closed");
                     }
                 }
-            } else if (response == JOptionPane.CLOSED_OPTION) {
-                System.out.println("JOptionPane closed");
             }
         }
 
         /**
-         * Display dialog box that used to edit student information
+         * Display dialog box to allow edit unit details
          */
-        private void editStdDialogBox() {
-            JTextField stdIndex = new JTextField();
-
-            final JComponent[] inputs = new JComponent[] {
-                    new JLabel("Enter Student Number: "),
-                    stdIndex
-            };
-
-            int response = JOptionPane.showConfirmDialog(null, inputs , "Edit Student",
-                    JOptionPane.OK_CANCEL_OPTION);
-            if (response == JOptionPane.CANCEL_OPTION) {
-                System.out.println("Cancel button clicked");
-            } else if (response == JOptionPane.OK_OPTION) {
-                System.out.println("Ok button clicked");
-
-                if(stdIndex.getText().equals("") ){
-                    infoOnComponent = "Empty is not accepted.\n";
-                    infoOnComponent += "Please re-enter info.";
-                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
-                    infoOnComponent = "";
-                }
-                else{
-                    try{
-                        String userInput = stdIndex.getText();
-                        int index = Integer.parseInt(userInput);
-                        //read student file
-                        readStudentFile();
-
-                        for (int i = 0; i < studentList.size(); i++) {
-                            if (i == index){
-                                JLabel labelStd = new JLabel(studentList.get(i).getName());
-                                JTextField stdName = new JTextField();
-                                JTextField stdId = new JTextField();
-                                JTextField stdProgram = new JTextField();
-                                final JComponent[] UserInput = new JComponent[] {
-                                        new JLabel("Student you want to edit: "),
-                                        labelStd,
-                                        new JLabel("Enter New Student Name: "),
-                                        stdName,
-                                        new JLabel("Enter New Student ID: "),
-                                        stdId,
-                                        new JLabel("Enter New Student Program: "),
-                                        stdProgram
-                                };
-
-                                int responses = JOptionPane.showConfirmDialog(null, UserInput , "Create Student",
-                                        JOptionPane.OK_CANCEL_OPTION);
-                                if (responses == JOptionPane.CANCEL_OPTION) {
-                                    System.out.println("Cancel button clicked");
-                                } else if (responses == JOptionPane.OK_OPTION) {
-                                    System.out.println("Ok button clicked");
-
-                                    if(stdName.getText().equals("") && stdId.getText().equals("") && stdProgram.getText().equals("")){
-                                        infoOnComponent = "Incomplete student info.\n";
-                                        infoOnComponent += "Please re-enter student info.";
-                                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.WARNING_MESSAGE);
-                                        infoOnComponent = "";
-                                    }
-                                    else{
-                                        String inputName = stdName.getText();
-                                        String inputId = stdId.getText();
-                                        String inputProgram = stdProgram.getText();
-
-                                        studentList.get(i).setName(inputName);
-                                        studentList.get(i).setId(inputId);
-                                        studentList.get(i).setProgram(inputProgram);
-
-                                        //store arraylist in txt file
-                                        writeStudentFile();
-
-                                        infoOnComponent = "Student had been edited. \n" +
-                                                stdName.getText() + ", " +
-                                                stdId.getText() + ", " +
-                                                stdProgram.getText();
-                                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
-                                        infoOnComponent = "";
-                                        displayStudentList();
-                                    }
-                                } else if (responses == JOptionPane.CLOSED_OPTION) {
-                                    System.out.println("JOptionPane closed");
-                                }
-                            }
-                        }
-                    }catch (NumberFormatException e){
-                        infoOnComponent = "Enter number only.";
-                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
-                        infoOnComponent = "";
-                    }
-                }
-            } else if (response == JOptionPane.CLOSED_OPTION) {
-                System.out.println("JOptionPane closed");
+        private void editUnitDialogBox() {
+            //read unit file
+            readUnitFile();
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Unit anUnitList : unitList) {
+                String name = anUnitList.getName();
+                tempList.add(name);
             }
 
+            Object[] options = tempList.toArray();
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which unit to edit?",
+                    "Edit Unit",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < unitList.size(); i++) {
+                if (i == index){
+                    JLabel labelUnit = new JLabel(unitList.get(i).getName());
+                    JTextField unitName = new JTextField();
+                    JTextField unitCode = new JTextField();
+
+                    final JComponent[] UserInput = new JComponent[] {
+                            new JLabel("Unit you want to edit: "),
+                            labelUnit,
+                            new JLabel("Enter New Unit Name: "),
+                            unitName,
+                            new JLabel("Enter New Unit ID: "),
+                            unitCode,
+
+                    };
+
+                    int responses = JOptionPane.showConfirmDialog(null, UserInput , "Edit Unit",
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (responses == JOptionPane.CANCEL_OPTION) {
+                        System.out.println("Cancel button clicked");
+                    } else if (responses == JOptionPane.OK_OPTION) {
+                        System.out.println("Ok button clicked");
+
+                        if(unitName.getText().equals("") && unitCode.getText().equals("")){
+                            infoOnComponent = "Incomplete unit info.\n";
+                            infoOnComponent += "Please re-enter unit info.";
+                            JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.WARNING_MESSAGE);
+                            infoOnComponent = "";
+                        }
+                        else{
+                            String inputName = unitName.getText();
+                            String inputCode = unitCode.getText();
+
+                            unitList.get(i).setName(inputName);
+                            unitList.get(i).setCode(inputCode);
+
+                            //store arraylist in txt file
+                            writeUnitFile();
+
+                            infoOnComponent = "Student had been edited. \n" +
+                                    unitName.getText() + ", " +
+                                    unitCode.getText();
+                            JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+                            displayUnitList();
+                        }
+                    } else if (responses == JOptionPane.CLOSED_OPTION) {
+                        System.out.println("JOptionPane closed");
+                    }
+                }
+            }
         }
 
         /**
-         * Display dialog box to allow view of each student
+         * Display dialog box for view each unit details
          */
-        private void viewStdDialogBox() {
-            JTextField stdIndex = new JTextField();
+        private void viewUnitDialogBox() {
+            //read unit file
+            readUnitFile();
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Unit anUnitList : unitList) {
+                String name = anUnitList.getName();
+                tempList.add(name);
+            }
 
+            Object[] options = tempList.toArray();
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which unit to view?",
+                    "View Unit",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < unitList.size(); i++) {
+                if (i == index){
+                    String unitName = unitList.get(i).getName();
+                    String unitCode = unitList.get(i).getCode();
+
+                    infoOnComponent = "Unit Name: " + unitName + "\n"
+                            + "Unit Code: " + unitCode + "\n";
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.INFORMATION_MESSAGE);
+                    infoOnComponent = "";
+                }
+            }
+        }
+
+        /**
+         * Display dialog box for create unit
+         */
+        private void createUnitDialogBox() {
+            JTextField unitName = new JTextField();
+            JTextField unitCode = new JTextField();
             final JComponent[] inputs = new JComponent[] {
-                    new JLabel("Enter Student Number: "),
-                    stdIndex
+                    new JLabel("Enter Unit Name: "),
+                    unitName,
+                    new JLabel("Enter Unit Code: "),
+                    unitCode
             };
 
-            int response = JOptionPane.showConfirmDialog(null, inputs , "View Student",
+            int response = JOptionPane.showConfirmDialog(null, inputs , "Create Unit",
                     JOptionPane.OK_CANCEL_OPTION);
             if (response == JOptionPane.CANCEL_OPTION) {
                 System.out.println("Cancel button clicked");
             } else if (response == JOptionPane.OK_OPTION) {
                 System.out.println("Ok button clicked");
 
-                if(stdIndex.getText().equals("") ){
-                    infoOnComponent = "Empty is not accepted.\n";
-                    infoOnComponent += "Please re-enter info.";
-                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
+                if(unitName.getText().equals("") && unitCode.getText().equals("") ){
+                    infoOnComponent = "Incomplete unit info.\n";
+                    infoOnComponent += "Please re-enter unit info.";
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.ERROR_MESSAGE);
                     infoOnComponent = "";
                 }
                 else{
-                    try{
-                        String userInput = stdIndex.getText();
-                        int index = Integer.parseInt(userInput);
-                        //read student file
-                        readStudentFile();
+                    String inputName = unitName.getText();
+                    String inputCode = unitCode.getText();
 
-                        for (int i = 0; i < studentList.size(); i++) {
-                            if (i == index){
-                                String stdName = studentList.get(i).getName();
-                                String stdId = studentList.get(i).getId();
-                                String stdProgram = studentList.get(i).getProgram();
+                    //create unit, add to arraylist
+                    Unit newUnit = new Unit(inputName, inputCode);
+                    unitList.add(newUnit);
 
-                                infoOnComponent = "Student Name: " + stdName + "\n"
-                                                + "Student ID: " + stdId + "\n"
-                                                + "Student Program: " + stdProgram;
-                                JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
-                                infoOnComponent = "";
-                            }
-                        }
-                    }catch (NumberFormatException e){
-                        infoOnComponent = "Enter number only.";
-                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.ERROR_MESSAGE);
-                        infoOnComponent = "";
-                    }
+                    //store arraylist in txt file
+                    writeUnitFile();
+
+                    infoOnComponent = "You entered " +
+                            unitName.getText() + ", " +
+                            unitCode.getText();
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Unit Information", JOptionPane.INFORMATION_MESSAGE);
+                    infoOnComponent = "";
+
+                    //display unit list
+                    displayUnitList();
                 }
             } else if (response == JOptionPane.CLOSED_OPTION) {
                 System.out.println("JOptionPane closed");
@@ -464,14 +445,233 @@ public class Gui extends JFrame implements ActionListener{
         /**
          * Display student list to text area
          */
+        private void displayUnitList() {
+            textArea1.setText("Unit Lists: \n" );
+
+            //read unit file
+            readUnitFile();
+
+            //loop for unit list
+            for (int i = 0; i < unitList.size(); i++) {
+                textArea1.append(i + "." + unitList.get(i).getName() + "\n");
+            }
+        }
+
+        //read unit file
+        private void readUnitFile(){
+            File unitFile = new File("unit.txt");
+            if (unitFile.length() == 0) {
+                System.out.println("File is empty.");
+            } else {
+                try {
+                    FileInputStream fis2 = new FileInputStream("unit.txt");
+                    ObjectInputStream ois2 = new ObjectInputStream(fis2);
+                    unitList = (ArrayList) ois2.readObject();
+                    ois2.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        //write unit file
+        private void writeUnitFile(){
+            try {
+                FileOutputStream fos2 = new FileOutputStream("unit.txt");
+                ObjectOutputStream oos2 = new ObjectOutputStream(fos2);
+                oos2.writeObject(unitList);
+                oos2.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * Display dialog that allow user to delete student
+         */
+        private void deleteStdDialogBox() {
+            //read student file
+            readStudentFile();
+
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Student aStudentList : studentList) {
+                String name = aStudentList.getName();
+                tempList.add(name);
+            }
+
+            Object[] options = tempList.toArray();
+
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which student to delete?",
+                    "Delete Student",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < studentList.size(); i++) {
+                if (i == index){
+
+                    JLabel labelStd = new JLabel(studentList.get(i).getName());
+                    final JComponent[] UserInput = new JComponent[] {
+                            new JLabel("Do you want to delete this student?"),
+                            labelStd
+                    };
+
+                    int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (responses == JOptionPane.NO_OPTION) {
+                        System.out.println("No button clicked");
+                    } else if (responses == JOptionPane.YES_OPTION) {
+                        System.out.println("Yes button clicked");
+                        studentList.remove(i);
+                        writeStudentFile();
+                        infoOnComponent = "Student had been deleted. ";
+                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                        infoOnComponent = "";
+                        displayStudentList();
+                    } else if (responses == JOptionPane.CLOSED_OPTION) {
+                        System.out.println("JOptionPane closed");
+                    }
+                }
+            }
+        }
+
+        /**
+         * Display dialog box that used to edit student information
+         */
+        private void editStdDialogBox() {
+            //read student file
+            readStudentFile();
+
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Student aStudentList : studentList) {
+                String name = aStudentList.getName();
+                tempList.add(name);
+            }
+
+            Object[] options = tempList.toArray();
+
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which student to edit?",
+                    "Edit Student",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < studentList.size(); i++) {
+                if (i == index){
+                    JLabel labelStd = new JLabel(studentList.get(i).getName());
+                    JTextField stdName = new JTextField();
+                    JTextField stdId = new JTextField();
+                    JTextField stdProgram = new JTextField();
+                    final JComponent[] UserInput = new JComponent[] {
+                            new JLabel("Student you want to edit: "),
+                            labelStd,
+                            new JLabel("Enter New Student Name: "),
+                            stdName,
+                            new JLabel("Enter New Student ID: "),
+                            stdId,
+                            new JLabel("Enter New Student Program: "),
+                            stdProgram
+                    };
+
+                    int responses = JOptionPane.showConfirmDialog(null, UserInput , "Create Student",
+                            JOptionPane.OK_CANCEL_OPTION);
+                    if (responses == JOptionPane.CANCEL_OPTION) {
+                        System.out.println("Cancel button clicked");
+                    } else if (responses == JOptionPane.OK_OPTION) {
+                        System.out.println("Ok button clicked");
+
+                        if(stdName.getText().equals("") && stdId.getText().equals("") && stdProgram.getText().equals("")){
+                            infoOnComponent = "Incomplete student info.\n";
+                            infoOnComponent += "Please re-enter student info.";
+                            JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.WARNING_MESSAGE);
+                            infoOnComponent = "";
+                        }
+                        else{
+                            String inputName = stdName.getText();
+                            String inputId = stdId.getText();
+                            String inputProgram = stdProgram.getText();
+
+                            studentList.get(i).setName(inputName);
+                            studentList.get(i).setId(inputId);
+                            studentList.get(i).setProgram(inputProgram);
+
+                            //store arraylist in txt file
+                            writeStudentFile();
+
+                            infoOnComponent = "Student had been edited. \n" +
+                                    stdName.getText() + ", " +
+                                    stdId.getText() + ", " +
+                                    stdProgram.getText();
+                            JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+                            displayStudentList();
+                        }
+                    } else if (responses == JOptionPane.CLOSED_OPTION) {
+                        System.out.println("JOptionPane closed");
+                    }
+                }
+            }
+        }
+
+        /**
+         * Display dialog box to allow view of each student
+         */
+        private void viewStdDialogBox() {
+            //read student file
+            readStudentFile();
+
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Student aStudentList : studentList) {
+                String name = aStudentList.getName();
+                tempList.add(name);
+            }
+
+            Object[] options = tempList.toArray();
+
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which student to view?",
+                    "View Student",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < studentList.size(); i++) {
+                if (i == index){
+                    String stdName = studentList.get(i).getName();
+                    String stdId = studentList.get(i).getId();
+                    String stdProgram = studentList.get(i).getProgram();
+
+                    infoOnComponent = "Student Name: " + stdName + "\n"
+                            + "Student ID: " + stdId + "\n"
+                            + "Student Program: " + stdProgram;
+                    JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                    infoOnComponent = "";
+                }
+            }
+        }
+
+        /**
+         * Display student list to text area
+         */
         private void displayStudentList() {
             textArea1.setText("Student Lists: \n" );
-            File studentFile = new File("student.txt");
-            if (studentFile.length() == 0) {
-                System.out.println("Empty File");
-            } else {
-                readStudentFile();
-            }
+
+            //read student file
+            readStudentFile();
 
             //loop for student list
             for (int i = 0; i < studentList.size(); i++) {
@@ -537,13 +737,18 @@ public class Gui extends JFrame implements ActionListener{
          * Read student file
          */
         private void readStudentFile(){
-            try {
-                FileInputStream fis = new FileInputStream("student.txt");
-                ObjectInputStream ois = new ObjectInputStream(fis);
-                studentList = (ArrayList) ois.readObject();
-                ois.close();
-            } catch (Exception e) {
-                e.printStackTrace();
+            File studentFile = new File("student.txt");
+            if (studentFile.length() == 0) {
+                System.out.println("File is empty.");
+            } else {
+                try {
+                    FileInputStream fis = new FileInputStream("student.txt");
+                    ObjectInputStream ois = new ObjectInputStream(fis);
+                    studentList = (ArrayList) ois.readObject();
+                    ois.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -558,6 +763,104 @@ public class Gui extends JFrame implements ActionListener{
                 oos.close();
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        }
+
+        /**
+         * Display student menu
+         */
+        private class studentPanel extends JPanel{
+            public studentPanel() {
+                this.setLayout(new GridBagLayout());
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+
+                //create random label just for show
+                JLabel label1 = new JLabel("Student Menu");
+                Font myFont = new Font("Serif", Font.BOLD, 20);
+                label1.setFont(myFont);
+                this.add(label1, gbc);
+                gbc.gridy++;
+
+                //create a button
+                btnStdCreate = new JButton("Create Student");
+                btnStdView   = new JButton("View Student");
+                btnStdEdit   = new JButton("Edit Student");
+                btnStdDelete = new JButton("Delete Student");
+                btnStdBack = new JButton("Back to Home");
+                btnStdBack.setToolTipText("return to home");
+
+                //Create a listener for button and add button to it
+                ListenForButton lForButton = new ListenForButton();
+                btnStdCreate.addActionListener(lForButton);
+                btnStdView.addActionListener(lForButton);
+                btnStdEdit.addActionListener(lForButton);
+                btnStdDelete.addActionListener(lForButton);
+                btnStdBack.addActionListener(lForButton);
+
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.insets = new Insets(30,10,0,0);
+                gbc.ipady = 40;
+                gbc.ipadx = 100;
+                this.add(btnStdCreate,gbc);
+                gbc.gridy++;
+                this.add(btnStdView,gbc);
+                gbc.gridy++;
+                this.add(btnStdEdit,gbc);
+                gbc.gridy++;
+                this.add(btnStdDelete,gbc);
+                gbc.gridy++;
+                this.add(btnStdBack,gbc);
+            }
+        }
+
+        /**
+         * Unit panel that display manage unit event
+         */
+        private class unitPanel extends JPanel {
+            public unitPanel(){
+                this.setLayout(new GridBagLayout());
+                GridBagConstraints gbc = new GridBagConstraints();
+                gbc.gridx = 0;
+                gbc.gridy = 0;
+
+                //create random label just for show
+                JLabel label1 = new JLabel("Unit Menu");
+                Font myFont = new Font("Serif", Font.BOLD, 20);
+                label1.setFont(myFont);
+                this.add(label1, gbc);
+                gbc.gridy++;
+
+                //create a button
+                btnUnitCreate = new JButton("Create Unit");
+                btnUnitView   = new JButton("View Unit");
+                btnUnitEdit   = new JButton("Edit Unit");
+                btnUnitDelete = new JButton("Delete Unit");
+                btnUnitBack = new JButton("Back to Home");
+                btnUnitBack.setToolTipText("return to home");
+
+                //Create a listener for button and add button to it
+                ListenForButton lForButton = new ListenForButton();
+                btnUnitCreate.addActionListener(lForButton);
+                btnUnitView.addActionListener(lForButton);
+                btnUnitEdit.addActionListener(lForButton);
+                btnUnitDelete.addActionListener(lForButton);
+                btnUnitBack.addActionListener(lForButton);
+
+                gbc.fill = GridBagConstraints.HORIZONTAL;
+                gbc.insets = new Insets(30,10,0,0);
+                gbc.ipady = 40;
+                gbc.ipadx = 100;
+                this.add(btnUnitCreate,gbc);
+                gbc.gridy++;
+                this.add(btnUnitView,gbc);
+                gbc.gridy++;
+                this.add(btnUnitEdit,gbc);
+                gbc.gridy++;
+                this.add(btnUnitDelete,gbc);
+                gbc.gridy++;
+                this.add(btnUnitBack,gbc);
             }
         }
     }
