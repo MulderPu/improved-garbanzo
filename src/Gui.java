@@ -262,11 +262,11 @@ public class Gui extends JFrame implements ActionListener{
             }
             else if(e.getSource() == btnClassDelete){
                 System.out.println("Delete Class clicked");
-//                deleteClassDialogBox();
+                deleteClassDialogBox();
             }
             else if(e.getSource() == btnAddUnit){
                 System.out.println("Add unit clicked");
-//                addUnitDialogBox();
+                addUnitDialogBox();
             }
             else if(e.getSource() == btnAddStd){
                 System.out.println("Add student clicked");
@@ -300,6 +300,137 @@ public class Gui extends JFrame implements ActionListener{
                 System.out.println("Back button clicked");
                 frameClass.setVisible(false);
                 displayFrameHome();
+            }
+        }
+
+        private void addUnitDialogBox() {
+            //read class and unit files
+            readClassFile();
+            readUnitFile();
+
+            ArrayList<String> tempClassList = new ArrayList<>();
+            for (Class anClassList : classList) {
+                String name = anClassList.getName();
+                tempClassList.add(name);
+            }
+
+            Object[] classOptions = tempClassList.toArray();
+            Object classValue = JOptionPane.showInputDialog(null,
+                    "Which class you want to add unit?",
+                    "Select Class",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    classOptions,
+                    classOptions[0]);
+
+            int classIndex = tempClassList.indexOf(classValue);
+            System.out.println(classIndex);
+
+            ArrayList<String> tempUnitList = new ArrayList<>();
+            for (Unit anUnitList : unitList) {
+                String unitName = anUnitList.getName();
+                tempUnitList.add(unitName);
+            }
+
+            Object[] unitOptions = tempUnitList.toArray();
+            Object unitValue = JOptionPane.showInputDialog(null,
+                    "Which unit you want to add?",
+                    "Select Unit",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    unitOptions,
+                    unitOptions[0]);
+
+            int unitIndex = tempUnitList.indexOf(unitValue);
+            System.out.println(unitIndex);
+
+            for(int i =0; i<classList.size(); i++){
+                if(i == classIndex){
+                    String className = classList.get(i).getName();
+                    for (int j =0; j<unitList.size(); j++){
+                        if(j == unitIndex){
+                            String unitName = unitList.get(j).getName();
+
+                            JLabel labelClass = new JLabel(className);
+                            JLabel labelUnit = new JLabel(unitName);
+                            final JComponent[] UserInput = new JComponent[] {
+                                    new JLabel("Do you want to add unit: \n"),
+                                    labelUnit,
+                                    new JLabel("To this class? \n"),
+                                    labelClass
+                            };
+
+                            int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Add",
+                                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                            if (responses == JOptionPane.NO_OPTION) {
+                                System.out.println("No button clicked");
+                            } else if (responses == JOptionPane.YES_OPTION) {
+                                System.out.println("Yes button clicked");
+
+                                classList.get(i).setUnit(unitList.get(j));
+                                writeClassFile();
+
+                                infoOnComponent = classList.get(i).getUnit().getName() + " had been added to class: \n"+ classList.get(i).getName();
+                                JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                                infoOnComponent = "";
+                                displayClassList();
+                            } else if (responses == JOptionPane.CLOSED_OPTION) {
+                                System.out.println("JOptionPane closed");
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        private void deleteClassDialogBox() {
+            //read class file
+            readClassFile();
+
+            ArrayList<String> tempList = new ArrayList<>();
+            for (Class anClassList : classList) {
+                String name = anClassList.getName();
+                tempList.add(name);
+            }
+
+            Object[] options = tempList.toArray();
+            Object value = JOptionPane.showInputDialog(null,
+                    "Which class to delete?",
+                    "Delete Class",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]);
+
+            int index = tempList.indexOf(value);
+            System.out.println(index);
+
+            for (int i = 0; i < classList.size(); i++) {
+                if (i == index){
+
+                    JLabel labelClass = new JLabel(classList.get(i).getName());
+                    final JComponent[] UserInput = new JComponent[] {
+                            new JLabel("Do you want to delete this class?"),
+                            labelClass
+                    };
+
+                    int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Delete",
+                            JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    if (responses == JOptionPane.NO_OPTION) {
+                        System.out.println("No button clicked");
+                    } else if (responses == JOptionPane.YES_OPTION) {
+                        System.out.println("Yes button clicked");
+                        classList.remove(i);
+                        writeClassFile();
+                        infoOnComponent = "Class had been deleted. ";
+                        JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                        infoOnComponent = "";
+                        displayUnitList();
+                    } else if (responses == JOptionPane.CLOSED_OPTION) {
+                        System.out.println("JOptionPane closed");
+                    }
+                }
             }
         }
 
@@ -417,10 +548,12 @@ public class Gui extends JFrame implements ActionListener{
                     String classSem = classList.get(i).getSem();
                     String classYear = classList.get(i).getYear();
 
+
                     infoOnComponent = "Class Name: " + className + "\n"
                                     + "Class Code: " + classCode + "\n"
                                     + "Class Semester: " + classSem + "\n"
-                                    + "Class Year: " + classYear;
+                                    + "Class Year: " + classYear + "\n";
+                    infoOnComponent += classList.get(i).getUnit();
                     JOptionPane.showMessageDialog(Gui.this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
                     infoOnComponent = "";
                 }
