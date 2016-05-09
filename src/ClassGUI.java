@@ -8,8 +8,10 @@ import java.util.ArrayList;
 /**
  * Project Name : improved-garbanzo
  * Created by Mulder on 5/9/2016.
+ *
+ * To display class GUI
  */
-public class ClassGUI extends JFrame {
+class ClassGUI extends JFrame {
     private JFrame frameClass;
     private JButton btnClassCreate, btnClassView, btnClassEdit, btnClassDelete, btnAddUnit, btnAddStd, btnRemoveStd, btnAddAss,
             btnAssignMark, btnViewMark, btnViewSummaryReport, btnViewIndividualReport, btnClassBack;
@@ -23,11 +25,11 @@ public class ClassGUI extends JFrame {
     private static  ArrayList<Assessment> assessmentList2 = new ArrayList<>();
     private static ArrayList<Submission> submissionsList = new ArrayList<>();
 
-    public ClassGUI(){
+    ClassGUI(){
         displayClassFrame();
     }
 
-    public void displayClassFrame(){
+    private void displayClassFrame(){
         frameClass = new JFrame("Student Assessment Recording Application");
         frameClass.setSize(1000,700);
         //Create menu bar
@@ -259,7 +261,7 @@ public class ClassGUI extends JFrame {
     }
 
     private class classRightPanel extends JPanel {
-        public classRightPanel(){
+        classRightPanel(){
             this.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -608,7 +610,9 @@ public class ClassGUI extends JFrame {
         }
     }
 
-    //read class file
+    /**
+     * read class file
+     */
     private void readClassFile(){
         File classFile = new File("class.txt");
         if (classFile.length() == 0) {
@@ -625,7 +629,9 @@ public class ClassGUI extends JFrame {
         }
     }
 
-    //write class file
+    /**
+     * write class file
+     */
     private void writeClassFile(){
         try {
             FileOutputStream fos3 = new FileOutputStream("class.txt");
@@ -665,6 +671,25 @@ public class ClassGUI extends JFrame {
                 ObjectInputStream ois2 = new ObjectInputStream(fis2);
                 unitList = (ArrayList) ois2.readObject();
                 ois2.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Read student file
+     */
+    private void readStudentFile(){
+        File studentFile = new File("student.txt");
+        if (studentFile.length() == 0) {
+            System.out.println("File is empty.");
+        } else {
+            try {
+                FileInputStream fis = new FileInputStream("student.txt");
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                studentList = (ArrayList) ois.readObject();
+                ois.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

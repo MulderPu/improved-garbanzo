@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * Display manage student gui
  */
-public class StudentGUI extends JFrame {
+class StudentGUI extends JFrame {
     private JFrame frameStd;
     private MenuBar menubar = new MenuBar();
     private JButton btnStdCreate, btnStdView, btnStdEdit, btnStdDelete, btnStdBack;
@@ -22,14 +22,14 @@ public class StudentGUI extends JFrame {
     /**
      * Constructor to display the GUI
      */
-    public StudentGUI(){
+    StudentGUI(){
         displayStudentFrame();
     }
 
     /**
      * Attribute of Student GUI
      */
-    public void displayStudentFrame(){
+    private void displayStudentFrame(){
         frameStd = new JFrame("Student Assessment Recording Application");
         frameStd.setSize(1000,700);
         //Create menu bar
@@ -409,7 +409,7 @@ public class StudentGUI extends JFrame {
      */
     private class stdRightPanel extends JPanel {
 
-        public stdRightPanel(){
+        stdRightPanel(){
             this.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
  *
  * Display manage unit GUI
  */
-public class UnitGUI extends JFrame {
+class UnitGUI extends JFrame {
     private JFrame frameUnit;
     private MenuBar menubar = new MenuBar();
     private JTextArea textArea1;
@@ -22,7 +22,7 @@ public class UnitGUI extends JFrame {
     /**
      * Constructor that used to display unit frame when manage unit button is clicked
      */
-    public UnitGUI(){
+    UnitGUI(){
         displayUnitFrame();
     }
 
@@ -364,7 +364,7 @@ public class UnitGUI extends JFrame {
      * Display right panel for unit frame
      */
     private class unitRightPanel extends JPanel {
-        public unitRightPanel(){
+        unitRightPanel(){
             this.setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
             gbc.gridx = 0;

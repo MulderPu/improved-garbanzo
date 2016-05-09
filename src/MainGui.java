@@ -157,12 +157,5 @@ class MainGui extends JFrame{
                 }
             }
         }
-
-
-
-
-
-
     }
-
 }
