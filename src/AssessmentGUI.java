@@ -64,8 +64,8 @@ class AssessmentGUI extends JFrame{
      * Read assessment file
      */
     private void readAssessmentFile() {
-        File unitFile = new File("assessment.txt");
-        if (unitFile.length() == 0) {
+        File assessmentFile = new File("assessment.txt");
+        if (assessmentFile.length() == 0) {
             System.out.println("File is empty.");
         } else {
             try {
@@ -80,7 +80,7 @@ class AssessmentGUI extends JFrame{
     }
 
     /**
-     * write assessment file
+     * Write assessment file
      */
     private static void writeAssessmentFile(){
         try {

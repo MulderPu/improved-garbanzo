@@ -97,7 +97,7 @@ class UnitGUI extends JFrame {
     /**
      * Delete unit
      */
-    private void deleteUnitDialogBox() {
+    private void deleteUnit() {
         //read unit file
         readUnitFile();
 
@@ -150,7 +150,7 @@ class UnitGUI extends JFrame {
     /**
      * Display dialog box to allow edit unit details
      */
-    private void editUnitDialogBox() {
+    private void editUnit() {
         //read unit file
         readUnitFile();
         ArrayList<String> tempList = new ArrayList<>();
@@ -227,7 +227,7 @@ class UnitGUI extends JFrame {
     /**
      * Display dialog box for view each unit details
      */
-    private void viewUnitDialogBox() {
+    private void viewUnit() {
         //read unit file
         readUnitFile();
         ArrayList<String> tempList = new ArrayList<>();
@@ -264,7 +264,7 @@ class UnitGUI extends JFrame {
     /**
      * Display dialog box for create unit
      */
-    private void createUnitDialogBox() {
+    private void createUnit() {
         JTextField unitName = new JTextField();
         JTextField unitCode = new JTextField();
         final JComponent[] inputs = new JComponent[] {
@@ -393,19 +393,19 @@ class UnitGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnUnitCreate){
                 System.out.println("Create unit clicked");
-                createUnitDialogBox();
+                createUnit();
             }
             else if(e.getSource() == btnUnitView){
                 System.out.println("View unit clicked");
-                viewUnitDialogBox();
+                viewUnit();
             }
             else if(e.getSource() == btnUnitEdit){
                 System.out.println("Edit unit clicked");
-                editUnitDialogBox();
+                editUnit();
             }
             else if(e.getSource() == btnUnitDelete){
                 System.out.println("Delete unit clicked");
-                deleteUnitDialogBox();
+                deleteUnit();
             }
             else if(e.getSource() == btnUnitBack){
                 System.out.println("Back button clicked");

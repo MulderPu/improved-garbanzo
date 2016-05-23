@@ -14,21 +14,28 @@ import java.util.ArrayList;
 class ClassGUI extends JFrame {
     private JFrame frameClass;
     private JButton btnClassCreate, btnClassView, btnClassEdit, btnClassDelete, btnAddUnit, btnAddStd, btnRemoveStd, btnAddAss,
-            btnAssignMark, btnViewMark, btnViewSummaryReport, btnViewIndividualReport, btnClassBack;
+            btnAssignMark, btnViewMark, btnViewSummaryReport, btnViewUnitReport, btnClassBack;
     private JTextArea textArea1;
     private String infoOnComponent = "";
     private MenuBar menubar = new MenuBar();
     private static ArrayList<Student> studentList = new ArrayList<>();
+    private static ArrayList<Student> studentList2 = new ArrayList<>();
     private static  ArrayList<Unit> unitList = new ArrayList<>();
     private static  ArrayList<Class> classList = new ArrayList<>();
     private static  ArrayList<Assessment> assessmentList = new ArrayList<>();
     private static  ArrayList<Assessment> assessmentList2 = new ArrayList<>();
     private static ArrayList<Submission> submissionsList = new ArrayList<>();
 
+    /**
+     * Class GUI constructor
+     */
     ClassGUI(){
         displayClassFrame();
     }
 
+    /**
+     * Display class frame
+     */
     private void displayClassFrame(){
         frameClass = new JFrame("Student Assessment Recording Application");
         frameClass.setSize(1000,700);
@@ -64,7 +71,7 @@ class ClassGUI extends JFrame {
             btnAddAss               = new JButton("Add Assessment");
             btnAssignMark           = new JButton("Assign Mark");
             btnViewMark             = new JButton("View Mark");
-            btnViewIndividualReport = new JButton("Individual Report");
+            btnViewUnitReport = new JButton("Individual Report");
             btnViewSummaryReport    = new JButton("Summary Report");
             btnClassBack            = new JButton("Back to Home");
             btnClassBack.setToolTipText("return to home");
@@ -81,7 +88,7 @@ class ClassGUI extends JFrame {
             btnAddAss.addActionListener(lForButton);
             btnAssignMark.addActionListener(lForButton);
             btnViewMark.addActionListener(lForButton);
-            btnViewIndividualReport.addActionListener(lForButton);
+            btnViewUnitReport.addActionListener(lForButton);
             btnViewSummaryReport.addActionListener(lForButton);
             btnClassBack.addActionListener(lForButton);
 
@@ -182,7 +189,7 @@ class ClassGUI extends JFrame {
             gbc.gridwidth = 1;
             gbc.gridx=1;
             gbc.gridy=5;
-            this.add(btnViewIndividualReport,gbc);
+            this.add(btnViewUnitReport,gbc);
             gbc.fill = GridBagConstraints.HORIZONTAL;
             gbc.insets = new Insets(15,15,0,0);
             gbc.ipady = 25;
@@ -201,50 +208,53 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Class button listener
+     */
     private class ListenForButton implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnClassCreate){
                 System.out.println("Create Class clicked");
-                createClassDialogBox();
+                createClass();
             }
             else if(e.getSource() == btnClassView){
                 System.out.println("View Class clicked");
-                viewClassDialogBox();
+                viewClass();
             }
             else if(e.getSource() == btnClassEdit){
                 System.out.println("Edit Class clicked");
-                editClassDialogBox();
+                editClass();
             }
             else if(e.getSource() == btnClassDelete){
                 System.out.println("Delete Class clicked");
-                deleteClassDialogBox();
+                deleteClass();
             }
             else if(e.getSource() == btnAddUnit){
                 System.out.println("Add unit clicked");
-                addUnitDialogBox();
+                addUnitToClass();
             }
             else if(e.getSource() == btnAddStd){
                 System.out.println("Add student clicked");
-//                addStudentDialogBox();
+                addStudentToClass();
             }
             else if(e.getSource() == btnRemoveStd){
                 System.out.println("Remove student clicked");
-//                removeStudentDialogBox();
+                removeStudentFromClass();
             }
             else if(e.getSource() == btnAddAss){
                 System.out.println("Add assessment clicked");
-//                addAssessmentDialogBox();
+                addAssessmentToClass();
             }
             else if(e.getSource() == btnAssignMark){
                 System.out.println("Assign mark clicked");
-//                assignMarkDialogBox();
+//                assignMarkToStudent();
             }
             else if(e.getSource() == btnViewMark){
                 System.out.println("View mark clicked");
-//                viewMarkDialogBox();
+//                viewMark();
             }
-            else if(e.getSource() == btnViewIndividualReport){
+            else if(e.getSource() == btnViewUnitReport){
                 System.out.println("View individual report clicked");
 //                individualReportDialogBox();
             }
@@ -260,6 +270,273 @@ class ClassGUI extends JFrame {
         }
     }
 
+    private void addAssessmentToClass() {
+        //read class and unit files
+        readClassFile();
+        readAssessmentFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Add assessment to which class?",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        ArrayList<String> tempAssessmentList = new ArrayList<>();
+        for (Assessment anAssessmentList : assessmentList) {
+            String assessmentName = anAssessmentList.getName();
+            tempAssessmentList.add(assessmentName);
+        }
+
+        Object[] assessmentOptions = tempAssessmentList.toArray();
+        Object assessmentValue = JOptionPane.showInputDialog(null,
+                "Add assessment?",
+                "Select Unit",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                assessmentOptions,
+                assessmentOptions[0]);
+
+        int assessmentIndex = tempAssessmentList.indexOf(assessmentValue);
+        System.out.println(assessmentIndex);
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<assessmentList.size(); j++){
+                    if(j == assessmentIndex){
+                        String assessmentName = assessmentList.get(j).getName();
+
+                        JLabel labelClass = new JLabel(className);
+                        JLabel labelAssessment = new JLabel(assessmentName);
+                        final JComponent[] UserInput = new JComponent[] {
+                                new JLabel("Do you want to add assessment: \n"),
+                                labelAssessment,
+                                new JLabel("To this class? \n"),
+                                labelClass
+                        };
+
+                        int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Add Assessment",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (responses == JOptionPane.NO_OPTION) {
+                            System.out.println("No button clicked");
+                        } else if (responses == JOptionPane.YES_OPTION) {
+                            System.out.println("Yes button clicked");
+
+                            classList.get(i).setAssessment(assessmentList.get(j));
+
+                            //extract student list and assessment list into variable from class list
+                            for (int k = 0; k < classList.size(); k++) {
+                                studentList = classList.get(k).getStudentList();
+                                assessmentList2 = classList.get(k).getAssessmentList();
+                            }
+
+                            for(int k =0; k < assessmentList2.size() ; k++){
+                                for(int l = 0; l < studentList.size(); l++){
+                                    String studName = studentList.get(l).getName();
+                                    String studId = studentList.get(l).getId();
+
+                                    Submission newSub = new Submission(studName, studId);
+                                    assessmentList2.get(k).setSubmission(newSub);
+                                }
+                            }
+
+                            System.out.println(classList.get(i).getAssessmentList());
+
+                            writeClassFile();
+
+                            infoOnComponent = "Assessment had been added to class.";
+                            JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+                            displayClassList();
+                        } else if (responses == JOptionPane.CLOSED_OPTION) {
+                            System.out.println("JOptionPane closed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void removeStudentFromClass() {
+        //read class file
+        readClassFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Remove student from which class?",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        for(int i =0; i<classList.size();i++){
+            studentList2 = classList.get(i).getStudentList();
+        }
+
+        ArrayList<String> tempStdList = new ArrayList<>();
+        for (Student aStudentList : studentList2) {
+            String stdName = aStudentList.getName();
+            tempStdList.add(stdName);
+        }
+
+        Object[] stdOptions = tempStdList.toArray();
+        Object stdValue = JOptionPane.showInputDialog(null,
+                "Remove student?",
+                "Select Student",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                stdOptions,
+                stdOptions[0]);
+
+        int stdIndex = tempStdList.indexOf(stdValue);
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<studentList2.size(); j++){
+                    if(j == stdIndex){
+                        String stdName = studentList2.get(j).getName();
+
+                        JLabel labelClass = new JLabel(className);
+                        JLabel labelStd = new JLabel(stdName);
+                        final JComponent[] UserInput = new JComponent[] {
+                                new JLabel("Do you want to remove this student: \n"),
+                                labelStd,
+                                new JLabel("From this class? \n"),
+                                labelClass
+                        };
+
+                        int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Remove Student",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (responses == JOptionPane.NO_OPTION) {
+                            System.out.println("No button clicked");
+                        } else if (responses == JOptionPane.YES_OPTION) {
+                            System.out.println("Yes button clicked");
+
+                            classList.get(i).removeStudent(studentList2.get(j).getName());
+
+                            assessmentList2 = classList.get(i).getAssessmentList();
+                            for(int k = 0; k < assessmentList2.size(); k++){
+                                assessmentList2.get(k).removeSubmission(studentList2.get(k).getName());
+                            }
+                            writeClassFile();
+
+                            infoOnComponent = "Student had been removed from class.";
+                            JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+                            displayClassList();
+
+                        } else if (responses == JOptionPane.CLOSED_OPTION) {
+                            System.out.println("JOptionPane closed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void addStudentToClass() {
+        //read class and student files
+        readClassFile();
+        readStudentFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Which class you want to add student?",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        ArrayList<String> tempStdList = new ArrayList<>();
+        for (Student aStudentList : studentList) {
+            String stdName = aStudentList.getName();
+            tempStdList.add(stdName);
+        }
+
+        Object[] stdOptions = tempStdList.toArray();
+        Object stdValue = JOptionPane.showInputDialog(null,
+                "Which student you want to add into the class?",
+                "Select Student",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                stdOptions,
+                stdOptions[0]);
+
+        int stdIndex = tempStdList.indexOf(stdValue);
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<studentList.size(); j++){
+                    if(j == stdIndex){
+                        String stdName = studentList.get(j).getName();
+
+                        JLabel labelClass = new JLabel(className);
+                        JLabel labelStd = new JLabel(stdName);
+                        final JComponent[] UserInput = new JComponent[] {
+                                new JLabel("Do you want to add this student: \n"),
+                                labelStd,
+                                new JLabel("To this class? \n"),
+                                labelClass
+                        };
+
+                        int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Add Student",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (responses == JOptionPane.NO_OPTION) {
+                            System.out.println("No button clicked");
+                        } else if (responses == JOptionPane.YES_OPTION) {
+                            System.out.println("Yes button clicked");
+
+                            classList.get(i).enrollStudent(studentList.get(j));
+                            writeClassFile();
+
+                            infoOnComponent = "Student had been added to the class.";
+                            JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+                            displayClassList();
+
+                        } else if (responses == JOptionPane.CLOSED_OPTION) {
+                            System.out.println("JOptionPane closed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Class right panel
+     */
     private class classRightPanel extends JPanel {
         classRightPanel(){
             this.setLayout(new GridBagLayout());
@@ -282,7 +559,10 @@ class ClassGUI extends JFrame {
         }
     }
 
-    private void addUnitDialogBox() {
+    /**
+     * Add unit to class
+     */
+    private void addUnitToClass() {
         //read class and unit files
         readClassFile();
         readUnitFile();
@@ -303,7 +583,6 @@ class ClassGUI extends JFrame {
                 classOptions[0]);
 
         int classIndex = tempClassList.indexOf(classValue);
-        System.out.println(classIndex);
 
         ArrayList<String> tempUnitList = new ArrayList<>();
         for (Unit anUnitList : unitList) {
@@ -321,7 +600,6 @@ class ClassGUI extends JFrame {
                 unitOptions[0]);
 
         int unitIndex = tempUnitList.indexOf(unitValue);
-        System.out.println(unitIndex);
 
         for(int i =0; i<classList.size(); i++){
             if(i == classIndex){
@@ -349,7 +627,7 @@ class ClassGUI extends JFrame {
                             classList.get(i).setUnit(unitList.get(j));
                             writeClassFile();
 
-                            infoOnComponent = classList.get(i).getUnit().getName() + " had been added to class: \n"+ classList.get(i).getName();
+                            infoOnComponent = "Unit had been added to class: \n"+ classList.get(i).getName();
                             JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
                             infoOnComponent = "";
                             displayClassList();
@@ -363,7 +641,10 @@ class ClassGUI extends JFrame {
         }
     }
 
-    private void deleteClassDialogBox() {
+    /**
+     * Delete class
+     */
+    private void deleteClass() {
         //read class file
         readClassFile();
 
@@ -413,7 +694,10 @@ class ClassGUI extends JFrame {
         }
     }
 
-    private void editClassDialogBox() {
+    /**
+     * Edit Class Details
+     */
+    private void editClass() {
         //read class file
         readClassFile();
         ArrayList<String> tempList = new ArrayList<>();
@@ -498,7 +782,10 @@ class ClassGUI extends JFrame {
         }
     }
 
-    private void viewClassDialogBox() {
+    /**
+     * View Class Details
+     */
+    private void viewClass() {
         //read class file
         readClassFile();
 
@@ -521,38 +808,57 @@ class ClassGUI extends JFrame {
         System.out.println(index);
 
         for (int i = 0; i < classList.size(); i++) {
+
+            studentList2 = classList.get(i).getStudentList();
+            assessmentList2 = classList.get(i).getAssessmentList();
+
             if (i == index){
                 String className = classList.get(i).getName();
                 String classCode = classList.get(i).getCode();
                 String classSem = classList.get(i).getSem();
                 String classYear = classList.get(i).getYear();
 
-
                 infoOnComponent = "Class Name: " + className + "\n"
                         + "Class Code: " + classCode + "\n"
                         + "Class Semester: " + classSem + "\n"
                         + "Class Year: " + classYear + "\n";
-                infoOnComponent += classList.get(i).getUnit();
+                infoOnComponent += classList.get(i).getUnit() + "\n";
+
+                //display student list
+                infoOnComponent += "List of students: " + "\n";
+                for(int j=0; j<studentList2.size(); j++){
+                    infoOnComponent += "\t" + j + "." + studentList2.get(j).getName() + "\n";
+                }
+
+                //display assessment list
+                infoOnComponent += "List of assessments: " + "\n";
+                for(int k=0; k<assessmentList2.size(); k++){
+                    infoOnComponent += "\t" + k + "." + assessmentList2.get(k).getName() + "\n";
+                }
+
                 JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
                 infoOnComponent = "";
             }
         }
     }
 
-    private void createClassDialogBox() {
+    /**
+     * Create class
+     */
+    private void createClass() {
         JTextField className = new JTextField();
         JTextField classCode = new JTextField();
         JTextField classSem  = new JTextField();
         JTextField classYear = new JTextField();
 
         final JComponent[] inputs = new JComponent[] {
-                new JLabel("Enter Class Name: "),
+                new JLabel(" Class Name: "),
                 className,
-                new JLabel("Enter Class Code: "),
+                new JLabel(" Class Code: "),
                 classCode,
-                new JLabel("Enter Class Semester: "),
+                new JLabel(" Class Semester: "),
                 classSem,
-                new JLabel("Enter Class Year: "),
+                new JLabel(" Class Year: "),
                 classYear,
         };
 
@@ -598,6 +904,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Display Class list
+     */
     private void displayClassList() {
         textArea1.setText("Class Lists: \n" );
 
@@ -690,6 +999,25 @@ class ClassGUI extends JFrame {
                 ObjectInputStream ois = new ObjectInputStream(fis);
                 studentList = (ArrayList) ois.readObject();
                 ois.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * read assessment file
+     */
+    private static void readAssessmentFile(){
+        File assessmentFile = new File("assessment.txt");
+        if (assessmentFile.length() == 0) {
+            System.out.println("File is empty.");
+        } else {
+            try {
+                FileInputStream fis4 = new FileInputStream("assessment.txt");
+                ObjectInputStream ois4 = new ObjectInputStream(fis4);
+                assessmentList = (ArrayList) ois4.readObject();
+                ois4.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }

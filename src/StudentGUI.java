@@ -48,7 +48,7 @@ class StudentGUI extends JFrame {
     /**
      * Display dialog that allow user to delete student
      */
-    private void deleteStdDialogBox() {
+    private void deleteStd() {
         //read student file
         readStudentFile();
 
@@ -102,7 +102,7 @@ class StudentGUI extends JFrame {
     /**
      * Display dialog box that used to edit student information
      */
-    private void editStdDialogBox() {
+    private void editStd() {
         //read student file
         readStudentFile();
 
@@ -185,7 +185,7 @@ class StudentGUI extends JFrame {
     /**
      * Display dialog box to allow view of each student
      */
-    private void viewStdDialogBox() {
+    private void viewStd() {
         //read student file
         readStudentFile();
 
@@ -241,7 +241,7 @@ class StudentGUI extends JFrame {
     /**
      * Display dialog box to create student
      */
-    private void createStdDialogBox() {
+    private void createStd() {
         JTextField stdName = new JTextField();
         JTextField stdId = new JTextField();
         JTextField stdProgram = new JTextField();
@@ -382,19 +382,19 @@ class StudentGUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             if(e.getSource() == btnStdCreate){
                 System.out.println("Student Create clicked");
-                createStdDialogBox();
+                createStd();
             }
             else if(e.getSource() == btnStdView){
                 System.out.println("View student clicked");
-                viewStdDialogBox();
+                viewStd();
             }
             else if(e.getSource() == btnStdEdit){
                 System.out.println("Edit student clicked");
-                editStdDialogBox();
+                editStd();
             }
             else if(e.getSource() == btnStdDelete){
                 System.out.println("Delete student clicked");
-                deleteStdDialogBox();
+                deleteStd();
             }
             else if(e.getSource() == btnStdBack){
                 System.out.println("Back button clicked");
