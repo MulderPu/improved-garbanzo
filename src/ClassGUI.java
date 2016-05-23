@@ -248,24 +248,415 @@ class ClassGUI extends JFrame {
             }
             else if(e.getSource() == btnAssignMark){
                 System.out.println("Assign mark clicked");
-//                assignMarkToStudent();
+                assignMarkToStudent();
             }
             else if(e.getSource() == btnViewMark){
                 System.out.println("View mark clicked");
-//                viewMark();
+                viewStdMark();
             }
             else if(e.getSource() == btnViewUnitReport){
                 System.out.println("View individual report clicked");
-//                individualReportDialogBox();
+                individualReport();
             }
             else if(e.getSource() == btnViewSummaryReport){
-                System.out.println("View Summary Report clicked");
-//                summaryReportDialogBox();
+                System.out.println("View Unit Summary Report clicked");
+                unitSummaryReport();
             }
             else if(e.getSource() == btnClassBack){
                 System.out.println("Back button clicked");
                 frameClass.setVisible(false);
                 new MainGui();
+            }
+        }
+    }
+
+    private void unitSummaryReport() {
+        //read class file
+        readClassFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Select a class: ",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        //extract assessment list into variable from class list
+        for (Class aClassList : classList) {
+            studentList2 = aClassList.getStudentList();
+            assessmentList2 = aClassList.getAssessmentList();
+        }
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+
+                final JComponent[] UserInput = new JComponent[] {
+                        new JLabel("Class: "+ className)
+                };
+
+                int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Unit",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if (responses == JOptionPane.NO_OPTION) {
+                    System.out.println("No button clicked");
+                    break;
+                } else if (responses == JOptionPane.YES_OPTION) {
+                    System.out.println("Yes button clicked");
+
+                    //dialog to display unit summary results
+                    if (classList.get(i).getName().equals(className)) {
+                        assessmentList = classList.get(i).getAssessmentList();
+                        classList.get(i).printSummaryReport();
+                        infoOnComponent =  "Unit: "+classList.get(i).getUnit().getName()+"\n";
+                        infoOnComponent +=  "Unit Code: "+classList.get(i).getUnit().getCode()+"\n";
+                        infoOnComponent +="Semester: " + classList.get(i).getSem() + ", " + classList.get(i).getYear()+"\n";
+
+                        //print results
+                        for(int j =0; j < assessmentList.size() ; j++){
+                            submissionsList = assessmentList.get(j).getSubmissionsList();
+                            infoOnComponent+= "\n" + "Assessment: " +assessmentList.get(j).getName()+ "\n";
+                            for(int k =0; k < submissionsList.size();k++) {
+                                infoOnComponent+= k + ". " + submissionsList.get(k).getId() + "     " + submissionsList.get(k).getName() + "    " + " Mark: " + submissionsList.get(k).getMark() + "\n";
+                            }
+                        }
+                        //number of candidates
+                        infoOnComponent+="\n"+"Total Number of candidates presenting: "+ submissionsList.size();
+                        JOptionPane.showMessageDialog(this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                        infoOnComponent = "";
+                    }
+                } else if (responses == JOptionPane.CLOSED_OPTION) {
+                    System.out.println("JOptionPane closed");
+                }
+            }
+        }
+
+    }
+
+    private void individualReport() {
+        //read class file
+        readClassFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Select a class: ",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        //extract assessment list into variable from class list
+        for (Class aClassList : classList) {
+            studentList2 = aClassList.getStudentList();
+            assessmentList2 = aClassList.getAssessmentList();
+        }
+
+        ArrayList<String> tempStdList = new ArrayList<>();
+        for (Student aStudentList : studentList2) {
+            String stdName = aStudentList.getName();
+            tempStdList.add(stdName);
+        }
+
+        Object[] stdOptions = tempStdList.toArray();
+        Object stdValue = JOptionPane.showInputDialog(null,
+                "Which student to view?",
+                "Select Student",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                stdOptions,
+                stdOptions[0]);
+
+        int stdIndex = tempStdList.indexOf(stdValue);
+
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<studentList2.size(); j++){
+                    if(j == stdIndex) {
+                        String stdName = studentList2.get(j).getName();
+
+                        final JComponent[] UserInput = new JComponent[] {
+                                new JLabel("Class: "+ className),
+                                new JLabel("Student:" + stdName)
+                        };
+
+                        int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm View Student's Mark",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (responses == JOptionPane.NO_OPTION) {
+                            System.out.println("No button clicked");
+                            break;
+                        } else if (responses == JOptionPane.YES_OPTION) {
+                            System.out.println("Yes button clicked");
+
+                            double totalStdMark = 0;
+
+                            for(int k =0; k < assessmentList2.size() ; k++){
+                                submissionsList = assessmentList2.get(k).getSubmissionsList();
+                                System.out.println(assessmentList2.get(k).getName());
+                                for(int l =0; l < submissionsList.size(); l++){
+                                    if(submissionsList.get(l).getName().equals(stdName)) {
+                                        System.out.println(submissionsList.get(l).getMark());
+                                        totalStdMark += submissionsList.get(l).getMark();
+                                    }
+                                }
+                            }
+                            System.out.println("\n" + "Total mark = " + totalStdMark);
+                            infoOnComponent = "Total mark = " + totalStdMark + "\n";
+
+                            if(totalStdMark < 50){
+                                System.out.println("Grade: N" );
+                                infoOnComponent += "Grade: N";
+                            }
+                            else if(totalStdMark >=50 && totalStdMark < 60){
+                                System.out.println("Grade: P");
+                                infoOnComponent += "Grade: P";
+                            }
+                            else if(totalStdMark >=60 && totalStdMark<70){
+                                System.out.println("Grade: C");
+                                infoOnComponent += "Grade: C";
+                            }
+                            else if(totalStdMark >=70 && totalStdMark<80){
+                                System.out.println("Grade: D");
+                                infoOnComponent += "Grade: D";
+                            }
+                            else {
+                                System.out.println("Grade: HD");
+                                infoOnComponent = "Grade: HD";
+                            }
+
+                            JOptionPane.showMessageDialog(this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
+                            infoOnComponent = "";
+
+                        } else if (responses == JOptionPane.CLOSED_OPTION) {
+                            System.out.println("JOptionPane closed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void viewStdMark() {
+        //read class file
+        readClassFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Which class to view?",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        //extract assessment list into variable from class list
+        for (Class aClassList : classList) {
+            assessmentList2 = aClassList.getAssessmentList();
+        }
+
+        ArrayList<String> tempAssessmentList = new ArrayList<>();
+        for (Assessment anAssessmentList : assessmentList2) {
+            String assessmentName = anAssessmentList.getName();
+            tempAssessmentList.add(assessmentName);
+        }
+
+        Object[] assessmentOptions = tempAssessmentList.toArray();
+        Object assessmentValue = JOptionPane.showInputDialog(null,
+                "Which assessment?",
+                "Select Assessment",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                assessmentOptions,
+                assessmentOptions[0]);
+
+        int assessmentIndex = tempAssessmentList.indexOf(assessmentValue);
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<assessmentList2.size(); j++){
+                    if(j == assessmentIndex) {
+                        String assessmentName = assessmentList2.get(j).getName();
+
+                        final JComponent[] UserInput = new JComponent[] {
+                                new JLabel("Class: "+ className),
+                                new JLabel("Assessment" + assessmentName)
+                        };
+
+                        int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm View Mark",
+                                JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                        if (responses == JOptionPane.NO_OPTION) {
+                            System.out.println("No button clicked");
+                            break;
+                        } else if (responses == JOptionPane.YES_OPTION) {
+                            System.out.println("Yes button clicked");
+
+                            submissionsList = assessmentList2.get(j).getSubmissionsList();
+                            textArea1.setText("Class: "+className+"\n" );
+                            textArea1.append("Assessment: "+assessmentName+"\n" );
+                            textArea1.append("List of Student's mark: \n" );
+                            for(int k =0; k < assessmentList2.size();k++) {
+                                textArea1.append(k + ") " +  submissionsList.get(k).getName() + "         " + " Mark: " + submissionsList.get(k).getMark()+ "\n");
+                            }
+                        } else if (responses == JOptionPane.CLOSED_OPTION) {
+                            System.out.println("JOptionPane closed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void assignMarkToStudent() {
+        //read class file
+        readClassFile();
+
+        ArrayList<String> tempClassList = new ArrayList<>();
+        for (Class anClassList : classList) {
+            String name = anClassList.getName();
+            tempClassList.add(name);
+        }
+
+        Object[] classOptions = tempClassList.toArray();
+        Object classValue = JOptionPane.showInputDialog(null,
+                "Which class to assign the mark?",
+                "Select Class",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                classOptions,
+                classOptions[0]);
+
+        int classIndex = tempClassList.indexOf(classValue);
+
+        //extract student list and assessment list into variable from class list
+        for (Class aClassList : classList) {
+            studentList2 = aClassList.getStudentList();
+            assessmentList2 = aClassList.getAssessmentList();
+        }
+
+        ArrayList<String> tempAssessmentList = new ArrayList<>();
+        for (Assessment anAssessmentList : assessmentList2) {
+            String assessmentName = anAssessmentList.getName();
+            tempAssessmentList.add(assessmentName);
+        }
+
+        Object[] assessmentOptions = tempAssessmentList.toArray();
+        Object assessmentValue = JOptionPane.showInputDialog(null,
+                "Which assessment?",
+                "Select Assessment",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                assessmentOptions,
+                assessmentOptions[0]);
+
+        int assessmentIndex = tempAssessmentList.indexOf(assessmentValue);
+
+        ArrayList<String> tempStdList = new ArrayList<>();
+        for (Student aStudentList : studentList2) {
+            String stdName = aStudentList.getName();
+            tempStdList.add(stdName);
+        }
+
+        Object[] stdOptions = tempStdList.toArray();
+        Object stdValue = JOptionPane.showInputDialog(null,
+                "Which student?",
+                "Select Student",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                stdOptions,
+                stdOptions[0]);
+
+        int stdIndex = tempStdList.indexOf(stdValue);
+
+        for(int i =0; i<classList.size(); i++){
+            if(i == classIndex){
+                String className = classList.get(i).getName();
+                for (int j =0; j<assessmentList2.size(); j++){
+                    if(j == assessmentIndex) {
+                        String assessmentName = assessmentList2.get(j).getName();
+                        for (int k = 0; k < studentList2.size(); k++) {
+                            if (k == stdIndex) {
+                                String stdName = studentList2.get(k).getName();
+
+                                JTextField stdMark  = new JTextField();
+                                final JComponent[] UserInput = new JComponent[] {
+                                        new JLabel("Class: " + className),
+                                        new JLabel("Assessment: " + assessmentName),
+                                        new JLabel("Student: " + stdName),
+                                        new JLabel("Weight : " + assessmentList2.get(j).getWeight()),
+                                        new JLabel(" Student Mark: "),
+                                        stdMark
+                                };
+
+                                int responses = JOptionPane.showConfirmDialog(null, UserInput , "Assign Mark",
+                                        JOptionPane.OK_CANCEL_OPTION);
+                                if (responses == JOptionPane.CANCEL_OPTION) {
+                                    System.out.println("Cancel button clicked");
+                                } else if (responses == JOptionPane.OK_OPTION) {
+                                    System.out.println("Ok button clicked");
+
+                                    if( stdMark.getText().equals("")){
+                                        infoOnComponent = "Incomplete mark input.\n";
+                                        infoOnComponent += "Please re-enter mark.";
+                                        JOptionPane.showMessageDialog(this, infoOnComponent, "Assessment Mark", JOptionPane.WARNING_MESSAGE);
+                                        infoOnComponent = "";
+                                    }
+                                    else{
+                                        String inputMark = stdMark.getText();
+                                        double inputStdMark = Double.parseDouble(inputMark);
+
+                                        if(assessmentList2.get(j).getName().equals(assessmentName)){
+                                            submissionsList = assessmentList2.get(j).getSubmissionsList();
+                                            for(int l =0; l < submissionsList.size(); l++){
+                                                if(submissionsList.get(l).getName().equals(stdName) ) {
+                                                    submissionsList.get(l).setMark(inputStdMark);
+                                                }
+                                            }
+                                        }
+
+
+                                        //store arraylist in txt file
+                                        writeClassFile();
+
+                                        infoOnComponent = "Student's mark had been assigned.";
+                                        JOptionPane.showMessageDialog(this, infoOnComponent, "Class Information", JOptionPane.INFORMATION_MESSAGE);
+                                        infoOnComponent = "";
+                                        displayClassList();
+                                    }
+                                } else if (responses == JOptionPane.CLOSED_OPTION) {
+                                    System.out.println("JOptionPane closed");
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -336,22 +727,22 @@ class ClassGUI extends JFrame {
                             classList.get(i).setAssessment(assessmentList.get(j));
 
                             //extract student list and assessment list into variable from class list
-                            for (int k = 0; k < classList.size(); k++) {
-                                studentList = classList.get(k).getStudentList();
-                                assessmentList2 = classList.get(k).getAssessmentList();
-                            }
+                            studentList = classList.get(i).getStudentList();
+                            assessmentList2 = classList.get(i).getAssessmentList();
 
                             for(int k =0; k < assessmentList2.size() ; k++){
-                                for(int l = 0; l < studentList.size(); l++){
-                                    String studName = studentList.get(l).getName();
-                                    String studId = studentList.get(l).getId();
+                                if(assessmentList2.get(i).getName().equals(assessmentName)) {
+                                    for (int l = 0; l < studentList.size(); l++) {
+                                        String studName = studentList.get(l).getName();
+                                        String studId = studentList.get(l).getId();
 
-                                    Submission newSub = new Submission(studName, studId);
-                                    assessmentList2.get(k).setSubmission(newSub);
+                                        Submission newSub = new Submission(studName, studId);
+                                        assessmentList2.get(k).setSubmission(newSub);
+                                    }
                                 }
                             }
 
-                            System.out.println(classList.get(i).getAssessmentList());
+//                            System.out.println(classList.get(i).getAssessmentList());
 
                             writeClassFile();
 
@@ -727,15 +1118,15 @@ class ClassGUI extends JFrame {
                 JTextField classYear = new JTextField();
 
                 final JComponent[] UserInput = new JComponent[] {
-                        new JLabel("Class you want to edit: "),
+                        new JLabel("Class: "),
                         labelClass,
-                        new JLabel("Enter New Class Name: "),
+                        new JLabel(" New Class Name: "),
                         className,
-                        new JLabel("Enter New Class Code: "),
+                        new JLabel(" New Class Code: "),
                         classCode,
-                        new JLabel("Enter New Class Semester: "),
+                        new JLabel(" New Class Semester: "),
                         classSem,
-                        new JLabel("Enter New Class Year: "),
+                        new JLabel(" New Class Year: "),
                         classYear
                 };
 
