@@ -9,16 +9,22 @@ import java.awt.event.*;
  * Display Main MainGui
  */
 class MainGui extends JFrame{
+    /**
+     * Initialize the variables needed for this class.
+     */
     private JFrame frameHome;
     private JButton btnManageStudent, btnManageUnit ,btnManageClass, btnManageAssessment, btnManageExit;
     private MenuBar menubar = new MenuBar();
 
+    /**
+     * Constructor used to display the Home Frame.
+     */
     MainGui(){
         displayFrameHome();
     }
 
     /**
-     * Display home frame
+     * Attribute of the home frame
      */
     private void displayFrameHome(){
         frameHome = new JFrame("Student Assessment Recording Application");
@@ -31,10 +37,15 @@ class MainGui extends JFrame{
         frameHome.add(new leftPanel());
         //display right panel
         frameHome.add(new rightPanel());
-        frameHome.setLocationRelativeTo(null);
+        frameHome.setLocationRelativeTo(null); //set mid
+        //Add window listener
         ListenForWindow lForWindow = new ListenForWindow();
         frameHome.addWindowListener(lForWindow);
         frameHome.setVisible(true);
+
+        //Add mouse listener
+        ListenForMouse lForMouse = new ListenForMouse();
+        frameHome.addMouseListener(lForMouse);
     }
 
     /**

@@ -12,6 +12,9 @@ import java.util.ArrayList;
  * Display assessment GUI
  */
 class AssessmentGUI extends JFrame{
+    /**
+     * initialize variables
+     */
     private MenuBar menubar = new MenuBar();
     private JButton btnAssCreate, btnAssView, btnAssEdit, btnAssDelete, btnAssBack;
     private JFrame frameAss = new JFrame();
@@ -20,14 +23,14 @@ class AssessmentGUI extends JFrame{
     private static ArrayList<Assessment> assessmentList = new ArrayList<>();
 
     /**
-     * Constructor for AssessmentGUI
+     * Constructor to display Assessment Frame
      */
     AssessmentGUI(){
         displayAssFrame();
     }
 
     /**
-     * To display assessment frame
+     * Attribute of assessment frame
      */
     private void displayAssFrame(){
         frameAss.setTitle("Student Assessment Recording Application");
@@ -39,10 +42,14 @@ class AssessmentGUI extends JFrame{
         frameAss.add(new AssessmentPanel());
         frameAss.add(new AssRightPanel());
         displayAssList(); //display unit list in text area
+        //add window listener
         ListenForWindow lForWindow = new ListenForWindow();
         frameAss.addWindowListener(lForWindow);
-        frameAss.setLocationRelativeTo(null);
+        frameAss.setLocationRelativeTo(null); //set mis
         frameAss.setVisible(true);
+        //add mouse listener
+        ListenForMouse lForMouse = new ListenForMouse();
+        frameAss.addMouseListener(lForMouse);
     }
 
     /**

@@ -12,6 +12,10 @@ import java.util.ArrayList;
  * To display class GUI
  */
 class ClassGUI extends JFrame {
+
+    /**
+     * init variables
+     */
     private JFrame frameClass;
     private JButton btnClassCreate, btnClassView, btnClassEdit, btnClassDelete, btnAddUnit, btnAddStd, btnRemoveStd, btnAddAss,
             btnAssignMark, btnViewMark, btnViewSummaryReport, btnViewUnitReport, btnClassBack;
@@ -34,7 +38,7 @@ class ClassGUI extends JFrame {
     }
 
     /**
-     * Display class frame
+     * Attribute of class frame
      */
     private void displayClassFrame(){
         frameClass = new JFrame("Student Assessment Recording Application");
@@ -46,10 +50,14 @@ class ClassGUI extends JFrame {
         frameClass.add(new classPanel());
         frameClass.add(new classRightPanel());
         displayClassList(); //display unit list in text area
+        //add window listener
         ListenForWindow lForWindow = new ListenForWindow();
         frameClass.addWindowListener(lForWindow);
-        frameClass.setLocationRelativeTo(null);
+        frameClass.setLocationRelativeTo(null); //set mid
         frameClass.setVisible(true);
+        //add mouse listener
+        ListenForMouse lForMouse = new ListenForMouse();
+        frameClass.addMouseListener(lForMouse);
     }
 
     /**
@@ -71,8 +79,8 @@ class ClassGUI extends JFrame {
             btnAddAss               = new JButton("Add Assessment");
             btnAssignMark           = new JButton("Assign Mark");
             btnViewMark             = new JButton("View Mark");
-            btnViewUnitReport = new JButton("Individual Report");
-            btnViewSummaryReport    = new JButton("Summary Report");
+            btnViewUnitReport       = new JButton("Individual Report");
+            btnViewSummaryReport    = new JButton("Unit Summary Report");
             btnClassBack            = new JButton("Back to Home");
             btnClassBack.setToolTipText("return to home");
 
@@ -270,10 +278,14 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Display the result of Unit's Summary Report
+     */
     private void unitSummaryReport() {
         //read class file
         readClassFile();
 
+        //save class list to temp list and add into the input dialog
         ArrayList<String> tempClassList = new ArrayList<>();
         for (Class anClassList : classList) {
             String name = anClassList.getName();
@@ -305,6 +317,7 @@ class ClassGUI extends JFrame {
                         new JLabel("Class: "+ className)
                 };
 
+                //dialog box to confirm
                 int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm Unit",
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (responses == JOptionPane.NO_OPTION) {
@@ -313,26 +326,25 @@ class ClassGUI extends JFrame {
                 } else if (responses == JOptionPane.YES_OPTION) {
                     System.out.println("Yes button clicked");
 
-                    //dialog to display unit summary results
+                    //display unit summary results
                     if (classList.get(i).getName().equals(className)) {
                         assessmentList = classList.get(i).getAssessmentList();
-                        classList.get(i).printSummaryReport();
-                        infoOnComponent =  "Unit: "+classList.get(i).getUnit().getName()+"\n";
-                        infoOnComponent +=  "Unit Code: "+classList.get(i).getUnit().getCode()+"\n";
-                        infoOnComponent +="Semester: " + classList.get(i).getSem() + ", " + classList.get(i).getYear()+"\n";
+
+                        textArea1.setText("Unit Summary Report\n\n");
+                        textArea1.append("Unit: "+classList.get(i).getUnit().getName()+"\n");
+                        textArea1.append("Unit Code: "+classList.get(i).getUnit().getCode()+"\n");
+                        textArea1.append("Semester: " + classList.get(i).getSem() + ", " + classList.get(i).getYear()+"\n");
 
                         //print results
                         for(int j =0; j < assessmentList.size() ; j++){
                             submissionsList = assessmentList.get(j).getSubmissionsList();
-                            infoOnComponent+= "\n" + "Assessment: " +assessmentList.get(j).getName()+ "\n";
+                            textArea1.append("\n" + "Assessment: " +assessmentList.get(j).getName()+ "\n");
                             for(int k =0; k < submissionsList.size();k++) {
-                                infoOnComponent+= k + ". " + submissionsList.get(k).getId() + "     " + submissionsList.get(k).getName() + "    " + " Mark: " + submissionsList.get(k).getMark() + "\n";
+                                textArea1.append(k + ". " + submissionsList.get(k).getId() + "     " + submissionsList.get(k).getName() + "    " + " Mark: " + submissionsList.get(k).getMark() + "\n");
                             }
                         }
                         //number of candidates
-                        infoOnComponent+="\n"+"Total Number of candidates presenting: "+ submissionsList.size();
-                        JOptionPane.showMessageDialog(this, infoOnComponent, "Student Information", JOptionPane.INFORMATION_MESSAGE);
-                        infoOnComponent = "";
+                        textArea1.append("\n"+"Total Number of candidates presenting: "+ submissionsList.size());
                     }
                 } else if (responses == JOptionPane.CLOSED_OPTION) {
                     System.out.println("JOptionPane closed");
@@ -342,10 +354,14 @@ class ClassGUI extends JFrame {
 
     }
 
+    /**
+     * Display the result of Student's Individual Report
+     */
     private void individualReport() {
         //read class file
         readClassFile();
 
+        //save class list into a temp list to use in input dialog
         ArrayList<String> tempClassList = new ArrayList<>();
         for (Class anClassList : classList) {
             String name = anClassList.getName();
@@ -369,12 +385,14 @@ class ClassGUI extends JFrame {
             assessmentList2 = aClassList.getAssessmentList();
         }
 
+        //save student list into temp list
         ArrayList<String> tempStdList = new ArrayList<>();
         for (Student aStudentList : studentList2) {
             String stdName = aStudentList.getName();
             tempStdList.add(stdName);
         }
 
+        //place temp list into input dialog
         Object[] stdOptions = tempStdList.toArray();
         Object stdValue = JOptionPane.showInputDialog(null,
                 "Which student to view?",
@@ -386,7 +404,7 @@ class ClassGUI extends JFrame {
 
         int stdIndex = tempStdList.indexOf(stdValue);
 
-
+        //get the result for both choices and display the result
         for(int i =0; i<classList.size(); i++){
             if(i == classIndex){
                 String className = classList.get(i).getName();
@@ -399,6 +417,7 @@ class ClassGUI extends JFrame {
                                 new JLabel("Student:" + stdName)
                         };
 
+                        //confirmation dialog box
                         int responses = JOptionPane.showConfirmDialog(null, UserInput, "Confirm View Student's Mark",
                                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                         if (responses == JOptionPane.NO_OPTION) {
@@ -409,6 +428,7 @@ class ClassGUI extends JFrame {
 
                             double totalStdMark = 0;
 
+                            //get the total mark of the student from the submissions
                             for(int k =0; k < assessmentList2.size() ; k++){
                                 submissionsList = assessmentList2.get(k).getSubmissionsList();
                                 System.out.println(assessmentList2.get(k).getName());
@@ -422,6 +442,7 @@ class ClassGUI extends JFrame {
                             System.out.println("\n" + "Total mark = " + totalStdMark);
                             infoOnComponent = "Total mark = " + totalStdMark + "\n";
 
+                            //check grade of total mark for the student
                             if(totalStdMark < 50){
                                 System.out.println("Grade: N" );
                                 infoOnComponent += "Grade: N";
@@ -455,6 +476,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Used to view student mark
+     */
     private void viewStdMark() {
         //read class file
         readClassFile();
@@ -534,6 +558,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Allow user to assign mark for the student
+     */
     private void assignMarkToStudent() {
         //read class file
         readClassFile();
@@ -661,6 +688,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Allow user to add assessment created into the classes
+     */
     private void addAssessmentToClass() {
         //read class and unit files
         readClassFile();
@@ -759,6 +789,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Allow user to remove student from the class
+     */
     private void removeStudentFromClass() {
         //read class file
         readClassFile();
@@ -846,6 +879,9 @@ class ClassGUI extends JFrame {
         }
     }
 
+    /**
+     * Allow user to add student into the class
+     */
     private void addStudentToClass() {
         //read class and student files
         readClassFile();

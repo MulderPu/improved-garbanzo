@@ -6,8 +6,8 @@ import java.util.ArrayList;
  * Created by Mulder on 3/28/2016.
  */
 public class Student implements Serializable {
-    /*
-    initialize variables
+    /**
+     * initialize variables
      */
     private String name;
     private String id;

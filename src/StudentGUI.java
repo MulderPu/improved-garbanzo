@@ -12,6 +12,10 @@ import java.util.ArrayList;
  * Display manage student gui
  */
 class StudentGUI extends JFrame {
+
+    /**
+     * Initialize the variable for Student GUI Class
+     */
     private JFrame frameStd;
     private MenuBar menubar = new MenuBar();
     private JButton btnStdCreate, btnStdView, btnStdEdit, btnStdDelete, btnStdBack;
@@ -39,10 +43,14 @@ class StudentGUI extends JFrame {
         frameStd.add(new studentPanel());
         frameStd.add(new stdRightPanel());
         displayStudentList(); //display student list in text area
+        //add window listener
         ListenForWindow lForWindow = new ListenForWindow();
         frameStd.addWindowListener(lForWindow);
         frameStd.setLocationRelativeTo(null);
         frameStd.setVisible(true);
+        //add mouse listener
+        ListenForMouse lForMouse = new ListenForMouse();
+        frameStd.addMouseListener(lForMouse);
     }
 
     /**

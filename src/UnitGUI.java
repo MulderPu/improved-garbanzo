@@ -12,6 +12,10 @@ import java.util.ArrayList;
  * Display manage unit GUI
  */
 class UnitGUI extends JFrame {
+
+    /**
+     * Initialize variables
+     */
     private JFrame frameUnit;
     private MenuBar menubar = new MenuBar();
     private JTextArea textArea1;
@@ -27,7 +31,7 @@ class UnitGUI extends JFrame {
     }
 
     /**
-     * Display unit frame
+     * Attribute of Unit Frame
      */
     private void displayUnitFrame() {
         frameUnit = new JFrame("Student Assessment Recording Application");
@@ -36,13 +40,19 @@ class UnitGUI extends JFrame {
         menubar.displayMenuBar(frameUnit);
         frameUnit.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frameUnit.setLayout(new GridLayout(1,2,0,0));
-        frameUnit.add(new unitPanel());
-        frameUnit.add(new unitRightPanel());
+        frameUnit.add(new unitPanel()); //unit panel with buttons
+        frameUnit.add(new unitRightPanel()); //right panel with text area
         displayUnitList(); //display unit list in text area
+
+        //Add window listener
         ListenForWindow lForWindow = new ListenForWindow();
         frameUnit.addWindowListener(lForWindow);
-        frameUnit.setLocationRelativeTo(null);
+        frameUnit.setLocationRelativeTo(null); //set mid
         frameUnit.setVisible(true);
+
+        //Add mouse listener
+        ListenForMouse lForMouse = new ListenForMouse();
+        frameUnit.addMouseListener(lForMouse);
     }
 
     /**

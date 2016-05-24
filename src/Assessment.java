@@ -7,6 +7,9 @@ import java.util.ArrayList;
  */
 public class Assessment implements Serializable {
 
+    /**
+     * init variables
+     */
     private String name;
     private ArrayList<Submission> submissionsList = new ArrayList<>();
     private String weight;
